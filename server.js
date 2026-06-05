@@ -1635,7 +1635,11 @@ app.get('/api/video/download/:id', async (req, res) => {
 
 // === SPA Catch-all: serve index.html for any unmatched GET routes ===
 // This fixes "NOT FOUND" when users bookmark or directly visit sub-page URLs on mobile/desktop
-app.get('{*path}', (req, res, next) => { if (req.path.startsWith('/api/')) return next(); res.sendFile(path.join(__dirname, 'public', 'index.html')); });
+app.get('/:path*', (req, res, next) => {
+  // Skip API routes, static files, and non-GET requests
+  if (req.path.startsWith('/api/') || req.path.startsWith('/assets/')) return next();
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 async function main() {
   await initR2();
