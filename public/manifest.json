@@ -1,0 +1,26 @@
+{
+  "name": "栗子素材网",
+  "short_name": "栗子素材",
+  "description": "专业美术素材下载平台，提供表情包、人物立绘、背景图、道具栏、特效等FLA源文件",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "lang": "zh-CN",
+  "categories": ["utilities"]
+}

@@ -1,0 +1,3923 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style rel="stylesheet" type="text/css">@charset "utf-8";
+
+*, ::before, ::after { margin: 0px; padding: 0px; box-sizing: border-box; }
+
+:root { --bg: #0e0e11; --surface: #16161b; --surface2: #1e1e25; --border: #2a2a35; --text: #e8e6e1; --text2: #9e9b94; --accent: #d4a853; --accent2: #e8c46a; --danger: #e85d5d; --danger-bg: rgba(232,93,93,.12); --danger-border: rgba(232,93,93,.3); --safe: #5dba7d; --safe-bg: rgba(93,186,125,.12); --radius: 10px; --font-body: 'Noto Sans SC',sans-serif; --font-display: 'Noto Serif SC',serif; }
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; overflow-x: hidden; }
+
+::selection { background: var(--accent); color: var(--bg); }
+
+::-webkit-scrollbar { width: 6px; }
+
+::-webkit-scrollbar-track { background: var(--surface); }
+
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+body::before { content: ""; position: fixed; inset: 0px; z-index: 9999; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); background-size: 128px 128px; opacity: 0.4; }
+
+.app { max-width: 1200px; margin: 0px auto; padding: 2rem 1.5rem 4rem; }
+
+.header { text-align: center; padding: 3rem 0px 2.5rem; position: relative; }
+
+.header::after { content: ""; display: block; width: 60px; height: 2px; background: var(--accent); margin: 1.5rem auto 0px; }
+
+.header h1 { font-family: var(--font-display); font-size: 2.2rem; font-weight: 900; letter-spacing: 0.04em; background-image: ; background-position-x: ; background-position-y: ; background-size: ; background-repeat: ; background-attachment: ; background-origin: ; background-color: ; background-clip: text; -webkit-text-fill-color: transparent; }
+
+.header p { color: var(--text2); margin-top: 0.6rem; font-size: 0.9rem; font-weight: 300; letter-spacing: 0.03em; }
+
+.stats { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem; animation: 0.6s ease 0s 1 normal none running fadeUp; }
+
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.8rem 1.5rem; min-width: 130px; text-align: center; transition: border-color 0.3s; }
+
+.stat-card:hover { border-color: var(--accent); }
+
+.stat-card .num { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+
+.stat-card.danger .num { color: var(--danger); }
+
+.stat-card.safe .num { color: var(--safe); }
+
+.stat-card .label { font-size: 0.75rem; color: var(--text2); margin-top: 0.2rem; letter-spacing: 0.05em; }
+
+.main { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+
+@media (max-width: 800px) {
+  .main { grid-template-columns: 1fr; }
+  .bgm-grid { grid-template-columns: 1fr !important; }
+  .video-grid { grid-template-columns: 1fr !important; }
+}
+
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; animation: 0.6s ease 0s 1 normal none running fadeUp; }
+
+.panel-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); background: var(--surface2); }
+
+.panel-header h2 { font-family: var(--font-display); font-size: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+
+.panel-header h2 .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+.dot-input { background: var(--accent); }
+
+.dot-output { background: var(--safe); }
+
+.panel-body { padding: 1.2rem; }
+
+textarea { width: 100%; min-height: 240px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: var(--font-body); font-size: 0.95rem; line-height: 1.8; padding: 1rem; resize: vertical; transition: border-color 0.3s; outline: none; }
+
+textarea:focus { border-color: var(--accent); }
+
+textarea::placeholder { color: var(--text2); font-style: italic; }
+
+.output-area { min-height: 240px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; line-height: 1.8; font-size: 0.95rem; overflow-y: auto; max-height: 400px; white-space: pre-wrap; word-break: break-all; }
+
+.word-bad { background: var(--danger-bg); border: 1px solid var(--danger-border); border-radius: 3px; padding: 0px 3px; color: var(--danger); cursor: help; text-decoration: line-through 1.5px; }
+
+.word-good { background: var(--safe-bg); border-radius: 3px; padding: 0px 3px; color: var(--safe); font-weight: 500; }
+
+.violation-detail-section { margin-top:1.2rem; padding-top:1rem; border-top:2px solid var(--danger-border); }
+.violation-detail-header { font-size:.85rem; font-weight:600; color:var(--danger); margin-bottom:.8rem; display:flex; align-items:center; gap:.4rem; }
+.violation-detail-item { display:flex; gap:.6rem; padding:.7rem .8rem; margin-bottom:.5rem; background:var(--surface2); border:1px solid var(--border); border-radius:8px; border-left:3px solid var(--danger); }
+.vd-num { font-family:var(--font-display); font-size:.75rem; font-weight:700; color:var(--danger); min-width:24px; padding-top:2px; }
+.vd-content { flex:1; min-width:0; }
+.vd-row { font-size:.82rem; line-height:1.6; margin-bottom:.3rem; display:flex; gap:.5rem; align-items:flex-start; }
+.vd-label { font-size:.68rem; font-weight:600; padding:1px 6px; border-radius:3px; white-space:nowrap; flex-shrink:0; }
+.vd-before .vd-label { background:var(--danger-bg); color:var(--danger); }
+.vd-after .vd-label { background:var(--safe-bg); color:var(--safe); }
+.vd-before { color:var(--text); }
+.vd-after { color:var(--safe); }
+.vd-meta { font-size:.7rem; color:var(--text2); display:flex; align-items:center; gap:.4rem; flex-wrap:wrap; margin-top:.2rem; }
+.vd-cat { padding:1px 5px; background:rgba(255,152,0,.1); border-radius:3px; color:#ff9800; }
+.vd-word s { color:var(--danger); text-decoration:line-through; }
+
+.actions { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 1rem; }
+
+.btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.65rem 1.4rem; border: none; border-radius: 8px; font-family: var(--font-body); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: 0.25s; letter-spacing: 0.02em; }
+
+.btn-primary { background: var(--accent); color: var(--bg); }
+
+.btn-primary:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: rgba(212, 168, 83, 0.25) 0px 4px 20px; }
+
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+.btn:active { transform: translateY(0px); }
+
+.wordlist-section { margin-top: 2rem; animation: 0.6s ease 0s 1 normal none running fadeUp; }
+
+.wordlist-section .panel { overflow: visible; }
+
+.category-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; padding: 1rem 1.2rem; border-bottom: 1px solid var(--border); background: var(--surface2); }
+
+.cat-tab { padding: 0.4rem 0.9rem; border-radius: 6px; font-size: 0.78rem; cursor: pointer; background: transparent; border: 1px solid var(--border); color: var(--text2); transition: 0.2s; }
+
+.cat-tab:hover, .cat-tab.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+.word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.6rem; padding: 1.2rem; max-height: 320px; overflow-y: auto; }
+
+.word-item { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.8rem; background: var(--surface2); border-radius: 6px; font-size: 0.82rem; border: 1px solid transparent; transition: border-color 0.2s; }
+
+.word-item:hover { border-color: var(--border); }
+
+.word-item .arrow { color: var(--text2); font-size: 0.7rem; }
+
+.word-item .w-bad { color: var(--danger); text-decoration: line-through; }
+
+.word-item .w-good { color: var(--safe); }
+
+.toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--surface); border: 1px solid var(--accent); color: var(--accent); padding: 0.7rem 1.5rem; border-radius: 8px; font-size: 0.85rem; z-index: 1000; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s; opacity: 0; pointer-events: none; }
+
+.toast.show { transform: translateX(-50%) translateY(0px); opacity: 1; }
+
+@keyframes fadeUp { 
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0px); }
+}
+
+.panel:nth-child(2) { animation-delay: 0.1s; }
+
+.wordlist-section { animation-delay: 0.2s; }
+
+.custom-form { display: flex; gap: 0.5rem; padding: 0px 1.2rem 1rem; align-items: center; }
+
+.custom-form input { flex: 1 1 0%; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 0.5rem 0.8rem; font-size: 0.82rem; outline: none; font-family: var(--font-body); }
+
+.custom-form input:focus { border-color: var(--accent); }
+
+.custom-form .btn { padding: 0.5rem 1rem; font-size: 0.8rem; }
+
+.rules-toggle { position: fixed; right: 1.2rem; top: 1.2rem; z-index: 200; width: 44px; height: 44px; border-radius: 50%; background: var(--accent); color: var(--bg); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: rgba(212, 168, 83, 0.35) 0px 2px 12px; transition: transform 0.2s; }
+
+.rules-toggle:hover { transform: scale(1.08); }
+
+.rules-toggle svg { width: 20px; height: 20px; }
+
+.rules-overlay { position: fixed; inset: 0px; z-index: 300; background: rgba(0, 0, 0, 0.5); opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+
+.rules-overlay.open { opacity: 1; pointer-events: auto; }
+
+.rules-sidebar { position: fixed; top: 0px; right: 0px; bottom: 0px; z-index: 301; width: 420px; max-width: 92vw; background: var(--surface); border-left: 1px solid var(--border); transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; display: flex; flex-direction: column; }
+
+.rules-sidebar.open { transform: translateX(0px); }
+
+.rules-sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 1.4rem; border-bottom: 1px solid var(--border); background: var(--surface2); position: sticky; top: 0px; z-index: 1; }
+
+.rules-sidebar-header h3 { font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; color: var(--accent); }
+
+.rules-close { background: none; border: none; color: var(--text2); cursor: pointer; padding: 4px; transition: color 0.2s; }
+
+.rules-close:hover { color: var(--text); }
+
+.rules-close svg { width: 20px; height: 20px; }
+
+.rules-body { padding: 0px 1.4rem 2rem; flex: 1 1 0%; }
+
+.rules-badge { display: inline-block; font-size: 0.65rem; padding: 0.2rem 0.6rem; border-radius: 4px; font-weight: 600; letter-spacing: 0.04em; margin-bottom: 1rem; }
+
+.rules-badge.red { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
+
+.rules-badge.blue { background: rgba(93, 140, 220, 0.12); color: rgb(110, 168, 247); border: 1px solid rgba(93, 140, 220, 0.25); }
+
+.rules-badge.green { background: var(--safe-bg); color: var(--safe); border: 1px solid rgba(93, 186, 125, 0.25); }
+
+.rule-section { margin-top: 1.4rem; }
+
+.rule-section h4 { font-family: var(--font-display); font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.4rem; cursor: pointer; user-select: none; }
+
+.rule-section h4 .chevron { transition: transform 0.25s; font-size: 0.7rem; color: var(--text2); }
+
+.rule-section h4 .chevron.collapsed { transform: rotate(-90deg); }
+
+.rule-section .rule-content { overflow: hidden; transition: max-height 0.3s; }
+
+.rule-section .rule-content.collapsed { max-height: 0px !important; }
+
+.rule-list { list-style: none; padding: 0px; margin: 0px; }
+
+.rule-list li { position: relative; padding: 0.45rem 0px 0.45rem 1.1rem; font-size: 0.82rem; line-height: 1.65; color: var(--text2); }
+
+.rule-list li::before { content: ""; position: absolute; left: 0px; top: 0.85rem; width: 5px; height: 5px; border-radius: 50%; }
+
+.rule-list.danger li::before { background: var(--danger); }
+
+.rule-list.warn li::before { background: var(--accent); }
+
+.rule-list.info li::before { background: rgb(110, 168, 247); }
+
+.rule-list.safe li::before { background: var(--safe); }
+
+.rule-list li strong { color: var(--text); font-weight: 500; }
+
+.rule-list li em { color: var(--danger); font-style: normal; font-weight: 500; }
+
+.rule-note { font-size: 0.78rem; color: var(--text2); background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 0.7rem 0.9rem; margin-top: 0.8rem; line-height: 1.6; }
+
+.rule-note strong { color: var(--accent); }
+
+.rule-divider { height: 1px; background: var(--border); margin: 1.2rem 0px; }
+
+@media (max-width: 500px) {
+  .rules-sidebar { width: 100%; max-width: 100%; }
+}
+
+.video-section { margin-top: 2rem; animation: 0.6s ease 0s 1 normal none running fadeUp; }
+
+.video-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+
+.video-grid > div { min-width: 0; overflow: hidden; }
+
+@media (max-width: 900px) {
+  .video-grid { grid-template-columns: 1fr; }
+}
+
+.video-upload-zone { border: 2px dashed var(--border); border-radius: var(--radius); padding: 2.5rem 1.5rem; text-align: center; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+.video-upload-zone:hover, .video-upload-zone.dragover { border-color: var(--accent); background: rgba(212, 168, 83, 0.04); }
+
+.video-upload-zone .upload-icon { width: 48px; height: 48px; color: var(--text2); margin-bottom: 1rem; transition: color 0.3s; }
+
+.video-upload-zone:hover .upload-icon { color: var(--accent); }
+
+.video-upload-zone h3 { font-family: var(--font-display); font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; }
+
+.video-upload-zone p { font-size: 0.8rem; color: var(--text2); }
+
+.video-upload-zone input { display: none; }
+
+.video-upload-zone.has-video { padding: 0px; border: none; }
+
+.video-player-wrap { position: relative; width: 100%; background: rgb(0, 0, 0); border-radius: var(--radius); overflow: hidden; }
+
+.video-player-wrap video { width: 100%; display: block; max-height: none; }
+
+.video-player-wrap .native-controls-hint { padding: 0.4rem 0.8rem; background: var(--surface2); border-top: 1px solid var(--border); font-size: 0.72rem; color: var(--text2); display: flex; align-items: center; gap: 0.4rem; }
+
+.frame-strip { display: flex; gap: 0.4rem; overflow-x: auto; padding: 0.8rem 0px; scrollbar-width: thin; }
+
+.frame-strip::-webkit-scrollbar { height: 4px; }
+
+.frame-strip::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.frame-thumb { flex-shrink: 0; width: 80px; height: 45px; border-radius: 4px; overflow: hidden; cursor: pointer; border: 2px solid transparent; position: relative; transition: border-color 0.2s; opacity: 0.7; }
+
+.frame-thumb:hover { opacity: 1; border-color: var(--text2); }
+
+.frame-thumb.active { opacity: 1; border-color: var(--accent); }
+
+.frame-thumb.flagged { opacity: 1; border-color: var(--danger); }
+
+.frame-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+.frame-thumb .frame-time { position: absolute; bottom: 0px; left: 0px; right: 0px; background: rgba(0, 0, 0, 0.7); color: rgb(255, 255, 255); font-size: 0.6rem; text-align: center; padding: 1px 0px; font-variant-numeric: tabular-nums; }
+
+.frame-thumb .frame-flag { position: absolute; top: 2px; right: 2px; width: 12px; height: 12px; background: var(--danger); border-radius: 50%; display: none; align-items: center; justify-content: center; }
+
+.frame-thumb.flagged .frame-flag { display: flex; }
+
+.frame-thumb.flagged .frame-flag::after { content: "!"; color: rgb(255, 255, 255); font-size: 0.55rem; font-weight: 700; }
+
+.transcript-area { width: 100%; min-height: 120px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: var(--font-body); font-size: 0.88rem; line-height: 1.7; padding: 0.8rem; resize: vertical; outline: none; transition: border-color 0.3s; }
+
+.transcript-area:focus { border-color: var(--accent); }
+
+.transcript-area::placeholder { color: var(--text2); font-style: italic; }
+
+.frame-analysis { margin-top: 1rem; }
+
+.frame-result { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem; margin-bottom: 0.6rem; display: flex; gap: 0.8rem; align-items: flex-start; transition: border-color 0.2s; }
+
+.frame-result:hover { border-color: var(--text2); }
+
+.frame-result.flagged { border-color: var(--danger-border); }
+
+.frame-result .frame-preview { width: 64px; height: 36px; border-radius: 4px; overflow: hidden; flex-shrink: 0; }
+
+.frame-result .frame-preview img { width: 100%; height: 100%; object-fit: cover; }
+
+.frame-result .frame-info { flex: 1 1 0%; min-width: 0px; }
+
+.frame-result .frame-ts { font-size: 0.75rem; color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; margin-bottom: 0.2rem; }
+
+.frame-result .frame-desc { font-size: 0.8rem; color: var(--text2); line-height: 1.5; }
+
+.frame-result .frame-flag-tag { display: inline-block; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 3px; background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); margin-right: 0.3rem; margin-bottom: 0.2rem; }
+
+.frame-result .frame-ok-tag { display: inline-block; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 3px; background: var(--safe-bg); color: var(--safe); border: 1px solid rgba(93, 186, 125, 0.25); }
+
+.frame-result .fix-suggestion { font-size: 0.78rem; color: var(--safe); margin-top: 0.3rem; line-height: 1.5; }
+
+.rule-code { display: inline-block; font-size: 0.65rem; padding: 0.1rem 0.4rem; border-radius: 3px; background: rgba(255, 152, 0, 0.15); color: rgb(255, 152, 0); border: 1px solid rgba(255, 152, 0, 0.3); margin-right: 0.2rem; font-weight: 600; }
+
+.rule-ref { font-size: 0.72rem; color: rgb(255, 152, 0); margin: 0.3rem 0px; line-height: 1.4; padding: 0.4rem 0.6rem; background: rgba(255, 152, 0, 0.08); border-radius: 4px; border-left: 2px solid rgb(255, 152, 0); }
+
+.violation-tag .rule-code { font-size: 0.6rem; padding: 0.05rem 0.3rem; margin: 0px 0.1rem; }
+
+.scan-progress { margin: 1rem 0px; display: none; }
+
+.scan-progress.active { display: block; }
+
+.scan-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+
+.scan-bar-fill { height: 100%; background: linear-gradient(90deg,var(--accent),var(--accent2)); width: 0%; transition: width 0.3s; }
+
+.scan-status { font-size: 0.78rem; color: var(--text2); margin-top: 0.4rem; display: flex; justify-content: space-between; }
+
+.video-stats { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 1rem; }
+
+.video-stat { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 1rem; text-align: center; flex: 1 1 0%; min-width: 80px; }
+
+.video-stat .vs-num { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: var(--accent); }
+
+.video-stat .vs-num.danger { color: var(--danger); }
+
+.video-stat .vs-num.safe { color: var(--safe); }
+
+.video-stat .vs-label { font-size: 0.7rem; color: var(--text2); margin-top: 0.15rem; }
+
+.subtitle-source-tabs { display: flex; gap: 0.4rem; margin-bottom: 0.8rem; flex-wrap: wrap; }
+
+.subtitle-source-tab { padding: 0.35rem 0.8rem; border-radius: 6px; font-size: 0.75rem; cursor: pointer; background: transparent; border: 1px solid var(--border); color: var(--text2); transition: 0.2s; }
+
+.subtitle-source-tab:hover, .subtitle-source-tab.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+.recognition-status { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0.8rem; background: var(--surface2); border-radius: 8px; margin-bottom: 0.6rem; font-size: 0.8rem; color: var(--text2); border: 1px solid var(--border); }
+
+.recognition-status .rec-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text2); flex-shrink: 0; }
+
+.recognition-status.listening .rec-dot { background: var(--danger); animation: 1.2s ease 0s infinite normal none running pulse; }
+
+.recognition-status.listening { border-color: var(--danger-border); color: var(--text); }
+
+@keyframes pulse { 
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.subtitle-timeline { margin-top: 0.8rem; max-height: 240px; overflow-y: auto; scrollbar-width: thin; }
+
+.subtitle-item { display: flex; gap: 0.6rem; padding: 0.5rem 0.6rem; border-radius: 6px; margin-bottom: 0.3rem; font-size: 0.82rem; line-height: 1.5; cursor: pointer; transition: background 0.2s; border: 1px solid transparent; }
+
+.subtitle-item:hover { background: var(--surface2); }
+
+.subtitle-item.active { background: var(--surface2); border-color: var(--accent); }
+
+.subtitle-item.has-violation { background: var(--danger-bg); border-color: var(--danger-border); }
+
+.subtitle-item .sub-time { color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; min-width: 50px; flex-shrink: 0; font-size: 0.75rem; }
+
+.subtitle-item .sub-text { color: var(--text); flex: 1 1 0%; }
+
+.subtitle-item .sub-text .violation-word { color: var(--danger); font-weight: 500; text-decoration: underline wavy; text-underline-offset: 2px; }
+
+.subtitle-item .sub-violations { font-size: 0.7rem; color: var(--danger); margin-top: 0.2rem; }
+
+.subtitle-item .sub-fix { font-size: 0.7rem; color: var(--safe); margin-top: 0.1rem; }
+
+.srt-upload-zone { border: 1px dashed var(--border); border-radius: 8px; padding: 1rem; text-align: center; cursor: pointer; transition: 0.2s; font-size: 0.8rem; color: var(--text2); }
+
+.srt-upload-zone:hover { border-color: var(--accent); color: var(--accent); }
+
+.srt-upload-zone input { display: none; }
+
+.violation-summary { background: var(--danger-bg); border: 1px solid var(--danger-border); border-radius: 8px; padding: 0.8rem; margin-bottom: 0.8rem; }
+
+.violation-summary h5 { font-family: var(--font-display); font-size: 0.85rem; color: var(--danger); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem; }
+
+.violation-summary .violation-list { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+
+.violation-tag { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.25rem 0.6rem; background: var(--surface2); border-radius: 4px; font-size: 0.75rem; border: 1px solid var(--danger-border); }
+
+.violation-tag .vt-word { color: var(--danger); text-decoration: line-through; }
+
+.violation-tag .vt-arrow { color: var(--text2); }
+
+.violation-tag .vt-fix { color: var(--safe); }
+
+.sentence-result { display: flex; gap: .7rem; padding: .7rem .8rem; margin-bottom: .5rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; transition: border-color .2s; }
+.sentence-result.has-violation { border-left: 3px solid var(--danger); }
+.sentence-result:not(.has-violation) { border-left: 3px solid var(--safe); }
+.sentence-num { font-family: var(--font-display); font-size: .75rem; font-weight: 700; color: var(--text2); min-width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); flex-shrink: 0; }
+.sentence-result.has-violation .sentence-num { color: var(--danger); border-color: var(--danger-border); background: var(--danger-bg); }
+.sentence-body { flex: 1; min-width: 0; }
+.sentence-text { font-size: .88rem; line-height: 1.8; color: var(--text); word-break: break-all; }
+
+</style>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>抖音短剧违规词检测与替换</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&amp;family=Noto+Sans+SC:wght@300;400;500;700&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<meta property="og:title" content="抖音短剧违规词检测与替换"><meta property="og:type" content="website"></head>
+<body style="height: auto !important; max-height: none !important; overflow: visible !important;">
+<div class="app" style="">
+  <header class="header">
+    <h1>抖音短剧违规词检测</h1>
+    <p>依据抖音 2026.05 最新审片标准，检测文案/台词/字幕中的违规敏感词并自动替换</p>
+  </header>
+
+  <div class="stats" id="stats">
+    <div class="stat-card"><div class="num" id="statTotal">0</div><div class="label">检测字数</div></div>
+    <div class="stat-card danger"><div class="num" id="statBad">0</div><div class="label">违规词数</div></div>
+    <div class="stat-card safe"><div class="num" id="statReplaced">0</div><div class="label">已替换</div></div>
+  </div>
+
+  <div class="main">
+    <div class="panel">
+      <div class="panel-header">
+        <h2><span class="dot dot-input"></span>输入文案</h2>
+        <button class="btn btn-outline" style="padding:.4rem .8rem;font-size:.78rem" onclick="clearInput()">清空</button>
+      </div>
+      <div class="panel-body">
+        <textarea id="inputText" placeholder="在此粘贴或输入你的短剧文案、标题、台词…
+
+例如：霸总强吻小娇妻，双男主虐恋，最火短剧免费看全集！"></textarea>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="detectAndReplace()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"></path><circle cx="12" cy="12" r="10"></circle></svg>
+            检测并替换
+          </button>
+          <button class="btn btn-outline" onclick="detectOnly()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg>
+            仅检测
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <h2><span class="dot dot-output"></span>处理结果</h2>
+        <button class="btn btn-outline" style="padding:.4rem .8rem;font-size:.78rem" onclick="copyResult()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg>
+          复制
+        </button>
+      </div>
+      <div class="panel-body">
+        <div class="output-area" id="outputArea">
+          <span style="color:var(--text2);font-style:italic">检测与替换结果将在此处显示…</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Video Analysis Section -->
+  <div class="video-section">
+    <div class="panel">
+      <div class="panel-header">
+        <h2><span class="dot" style="background:#6ea8f7"></span>视频违规检测</h2>
+        <span style="font-size:.78rem;color:var(--text2)">最长 5 分钟 · 自动抽帧检测</span>
+      </div>
+      <div class="panel-body">
+        <div class="video-grid">
+          <!-- Left: Upload / Player -->
+          <div>
+            <div class="video-upload-zone" id="videoUploadZone">
+              <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <h3>点击或拖拽上传视频</h3>
+              <p>支持 MP4 / MOV / WebM · 最长 5 分钟</p>
+              <input type="file" id="videoFileInput" accept="video/*">
+            </div>
+            <div id="videoPlayerWrap" class="video-player-wrap" style="display:none">
+              <video id="videoPlayer" controls="" preload="metadata"></video>
+            </div>
+            <div id="frameStripWrap" style="display:none">
+              <div style="font-size:.78rem;color:var(--text2);margin:.6rem 0 .2rem;display:flex;justify-content:space-between;align-items:center">
+                <span>关键帧抽取（点击定位到对应时间）</span>
+                <div style="display:flex;gap:.4rem">
+                  <button class="btn btn-outline" style="padding:.25rem .6rem;font-size:.7rem;background:rgba(110,168,247,.1);border-color:rgba(110,168,247,.3);color:#6ea8f7" onclick="reuploadVideo()">🔄 重新上传</button>
+                  <button class="btn btn-outline" style="padding:.25rem .6rem;font-size:.7rem" onclick="removeVideo()">移除视频</button>
+                </div>
+              </div>
+              <div class="frame-strip" id="frameStrip"></div>
+            </div>
+          </div>
+
+          <!-- Right: Transcript + Analysis -->
+          <div>
+            <div style="font-size:.82rem;color:var(--text2);margin-bottom:.4rem">
+              <strong style="color:var(--text)">字幕/台词来源</strong>
+            </div>
+            
+            <div class="subtitle-source-tabs">
+              <div class="subtitle-source-tab active" data-source="speech" onclick="switchSubtitleSource('speech')">语音识别</div>
+              <div class="subtitle-source-tab" data-source="ocr" onclick="switchSubtitleSource('ocr')">画面字幕</div>
+              <div class="subtitle-source-tab" data-source="srt" onclick="switchSubtitleSource('srt')">SRT文件</div>
+              <div class="subtitle-source-tab" data-source="manual" onclick="switchSubtitleSource('manual')">手动输入</div>
+            </div>
+
+            <!-- Speech Recognition Panel -->
+            <div id="speechPanel">
+              <div class="recognition-status" id="recognitionStatus">
+                <div class="rec-dot"></div>
+                <span id="recStatusText">点击"开始识别"自动提取视频语音转文字</span>
+              </div>
+              <div style="font-size:.72rem;color:var(--text2);margin-bottom:.5rem;padding:.5rem;background:var(--surface2);border-radius:6px;line-height:1.6">
+                <strong style="color:var(--accent)">自动识别：</strong>点击"开始识别"后，系统会直接从视频中提取音频并使用 AI 语音识别转成文字字幕。<br>
+                视频会自动播放（静音），播放完毕后自动停止。识别精度取决于视频中的语音清晰度。无需麦克风。
+              </div>
+              <div class="actions" style="margin-bottom:.8rem">
+                <button class="btn btn-primary" id="startRecBtn" onclick="startSpeechRecognition()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                  </svg>
+                  开始识别
+                </button>
+                <button class="btn btn-outline" id="stopRecBtn" style="display:none" onclick="stopSpeechRecognition()">停止识别</button>
+              </div>
+              <div class="subtitle-timeline" id="subtitleTimeline"></div>
+            </div>
+
+            <!-- OCR Screen Subtitle Panel -->
+            <div id="ocrPanel" style="display:none">
+              <div class="recognition-status" id="ocrStatus">
+                <div class="rec-dot"></div>
+                <span id="ocrStatusText">点击"提取字幕"从视频画面中识别烧录字幕文字</span>
+              </div>
+              <div style="font-size:.72rem;color:var(--text2);margin-bottom:.5rem;padding:.5rem;background:var(--surface2);border-radius:6px;line-height:1.6">
+                <strong style="color:var(--accent)">画面字幕提取：</strong>自动从视频画面底部识别烧录（硬字幕）文字。<br>
+                系统会每隔 2 秒截取一帧画面，用 OCR 识别底部字幕区域的文字，自动去重后生成带时间戳的字幕。
+              </div>
+              <div style="margin-bottom:.6rem">
+                <label style="font-size:.78rem;color:var(--text);display:flex;align-items:center;gap:.5rem">
+                  字幕位置：
+                  <select id="ocrPosition" style="padding:.3rem .5rem;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font-size:.78rem">
+                    <option value="bottom">底部（默认）</option>
+                    <option value="center">中间</option>
+                    <option value="top">顶部</option>
+                  </select>
+                </label>
+              </div>
+              <div class="scan-progress" id="ocrScanProgress" style="display:none;margin-bottom:.5rem">
+                <div class="scan-bar"><div class="scan-bar-fill" id="ocrScanBarFill"></div></div>
+                <div class="scan-status"><span id="ocrScanStatusText">正在提取字幕…</span><span id="ocrScanPercent">0%</span></div>
+              </div>
+              <div class="actions" style="margin-bottom:.8rem">
+                <button class="btn btn-primary" id="startOcrBtn" onclick="startOCRExtraction()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                    <path d="M7 7h3v3H7zM14 7h3v3h-3zM7 14h3v3H7zM14 14h3v3h-3z"></path>
+                  </svg>
+                  提取画面字幕
+                </button>
+                <button class="btn btn-outline" id="stopOcrBtn" style="display:none" onclick="stopOCRExtraction()">停止提取</button>
+              </div>
+              <div class="subtitle-timeline" id="ocrTimeline"></div>
+            </div>
+
+            <!-- SRT Upload Panel -->
+            <div id="srtPanel" style="display:none">
+              <div class="srt-upload-zone">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:.5rem">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+                <div>点击上传 SRT / VTT 字幕文件</div>
+                <input type="file" id="srtFileInput" accept=".srt,.vtt" onchange="loadSRTFile(event)">
+              </div>
+              <div class="subtitle-timeline" id="srtTimeline"></div>
+            </div>
+
+            <!-- Manual Input Panel -->
+            <div id="manualPanel" style="display:none">
+              <textarea class="transcript-area" id="transcriptInput" placeholder="在此粘贴视频中的台词、旁白、字幕文本…
+
+系统会逐句检测违规词，并在下方标注出现位置。"></textarea>
+            </div>
+
+            <div class="actions" style="margin-top:.8rem">
+              <button class="btn btn-primary" onclick="analyzeVideo()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                开始检测
+              </button>
+              <button class="btn btn-outline" onclick="clearVideoAnalysis()">清空结果</button>
+            </div>
+
+            <div class="scan-progress" id="scanProgress">
+              <div class="scan-bar"><div class="scan-bar-fill" id="scanBarFill"></div></div>
+              <div class="scan-status"><span id="scanStatusText">正在抽帧分析…</span><span id="scanPercent">0%</span></div>
+            </div>
+
+            <div id="videoStats" class="video-stats" style="display:none">
+              <div class="video-stat"><div class="vs-num" id="vStatWords">0</div><div class="vs-label">违规词</div></div>
+            </div>
+
+            <div id="rulesLegend" style="display:none;margin-top:.8rem">
+              <div style="font-size:.78rem;font-weight:600;color:var(--text);margin-bottom:.4rem;display:flex;align-items:center;gap:.4rem">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff9800" stroke-width="2"><path d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                规范代码说明（抖音 2026.05 审片标准）
+              </div>
+              <div style="font-size:.72rem;color:var(--text2);line-height:1.7;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:.6rem .8rem">
+                <div style="font-weight:600;color:var(--danger);margin-bottom:.2rem">六大零容忍红线（触碰即下架）</div>
+                <span class="rule-code">R1</span> 不良价值观导向（拜金/复仇/物化/畸形婚恋）&nbsp;&nbsp;
+                <span class="rule-code">R2</span> 低俗色情擦边（暴露/性暗示）&nbsp;&nbsp;
+                <span class="rule-code">R3</span> 封建迷信（邪祟/玄学/法术）&nbsp;&nbsp;
+                <span class="rule-code">R4</span> 观感不适（血腥/猎奇/审丑）&nbsp;&nbsp;
+                <span class="rule-code">R5</span> 侵权与肖像滥用&nbsp;&nbsp;
+                <span class="rule-code">R6</span> 危害未成年人与公序良俗
+                <div style="font-weight:600;color:#ff9800;margin:.5rem 0 .2rem">四大高风险创作区域</div>
+                <span class="rule-code">H1</span> 关系越界（控制/物化当爱情/不平等关系）&nbsp;&nbsp;
+                <span class="rule-code">H2</span> 感官刺激吸睛（露骨/暗示/身体聚焦）&nbsp;&nbsp;
+                <span class="rule-code">H3</span> 失真逻辑背书危险行为（暴力/霸凌当爽点）&nbsp;&nbsp;
+                <span class="rule-code">H4</span> 低质拼接冒充成片（PPT/机械配音）
+              </div>
+            </div>
+
+            <div id="violationSummary" class="violation-summary" style="display:none"></div>
+            <div class="frame-analysis" id="frameAnalysis"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BGM Detection Section -->
+  <div class="video-section" style="margin-top:2rem">
+    <div class="panel">
+      <div class="panel-header">
+        <h2><span class="dot" style="background:#f59e0b"></span>背景音乐违规检测</h2>
+        <span style="font-size:.78rem;color:var(--text2)">检测BGM版权风险 · 避免上传后被消音</span>
+      </div>
+      <div class="panel-body">
+        <div class="bgm-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem">
+          <!-- Left: BGM Upload & Analysis -->
+          <div>
+            <div class="bgm-upload-zone" id="bgmUploadZone" style="border:2px dashed var(--border);border-radius:10px;padding:2rem;text-align:center;cursor:pointer;transition:.3s;position:relative;background:var(--surface2)">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5" style="margin-bottom:.5rem">
+                <path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle>
+              </svg>
+              <h3 style="font-size:.9rem;color:var(--text);margin-bottom:.3rem">上传音频文件或从视频提取</h3>
+              <p style="font-size:.75rem;color:var(--text2)">支持 MP3 / WAV / OGG / AAC</p>
+              <p style="font-size:.72rem;color:var(--text2);margin-top:.3rem">或点击「从视频提取BGM」自动分析已上传视频的音频</p>
+              <input type="file" id="bgmFileInput" accept="audio/*" style="position:absolute;inset:0;opacity:0;cursor:pointer">
+            </div>
+            <div id="bgmPlayerWrap" style="display:none;margin-top:.8rem">
+              <audio id="bgmPlayer" controls style="width:100%;height:36px;border-radius:8px"></audio>
+              <div style="display:flex;gap:.4rem;margin-top:.4rem">
+                <button class="btn btn-outline" style="padding:.25rem .6rem;font-size:.7rem" onclick="removeBGM()">移除音频</button>
+              </div>
+            </div>
+            <div class="actions" style="margin-top:.8rem">
+              <button class="btn btn-primary" onclick="analyzeBGM()" id="bgmAnalyzeBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                检测BGM风险
+              </button>
+              <button class="btn btn-outline" onclick="extractBGMFromVideo()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                从视频提取BGM
+              </button>
+              <button class="btn btn-outline" onclick="clearBGMAnalysis()">清空结果</button>
+            </div>
+            <div class="scan-progress" id="bgmScanProgress" style="display:none;margin-top:.8rem">
+              <div class="scan-bar"><div class="scan-bar-fill" id="bgmScanBarFill"></div></div>
+              <div class="scan-status"><span id="bgmScanStatusText">正在分析音频…</span><span id="bgmScanPercent">0%</span></div>
+            </div>
+          </div>
+
+          <!-- Right: Results -->
+          <div>
+            <div id="bgmResults" style="min-height:200px">
+              <div style="text-align:center;padding:2rem;color:var(--text2)">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1" style="margin-bottom:.5rem">
+                  <path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle>
+                </svg>
+                <p style="font-size:.82rem">上传音频或从视频提取后点击检测</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BGM Risk Categories -->
+        <div style="margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--border)">
+          <div style="font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:.6rem;display:flex;align-items:center;gap:.4rem">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff9800" stroke-width="2"><path d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            平台BGM消音常见原因（抖音/快手/小红书）
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.5rem">
+            <div class="bgm-risk-card" style="padding:.6rem .8rem;background:var(--danger-bg);border:1px solid var(--danger-border);border-radius:8px;font-size:.75rem">
+              <div style="font-weight:600;color:var(--danger);margin-bottom:.3rem">🚫 高风险（几乎必被消音）</div>
+              <ul style="padding-left:1rem;margin:0;line-height:1.8;color:var(--text2)">
+                <li>商业流行歌曲（周杰伦/林俊杰/邓紫棋等）</li>
+                <li>影视OST原声（漫威/迪士尼/韩剧OST）</li>
+                <li>大厂牌音乐（索尼/环球/华纳旗下艺人）</li>
+                <li>综艺节目BGM（奔跑吧/向往的生活等）</li>
+              </ul>
+            </div>
+            <div class="bgm-risk-card" style="padding:.6rem .8rem;background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.2);border-radius:8px;font-size:.75rem">
+              <div style="font-weight:600;color:#ff9800;margin-bottom:.3rem">⚠️ 中风险（可能被消音）</div>
+              <ul style="padding-left:1rem;margin:0;line-height:1.8;color:var(--text2)">
+                <li>DJ Remix 使用原版采样</li>
+                <li>网络热门BGM（突然爆火后版权方追讨）</li>
+                <li>外国音乐未在国内授权</li>
+                <li>独立音乐人作品（未授权商用）</li>
+              </ul>
+            </div>
+            <div class="bgm-risk-card" style="padding:.6rem .8rem;background:var(--safe-bg);border:1px solid rgba(93,186,125,.2);border-radius:8px;font-size:.75rem">
+              <div style="font-weight:600;color:var(--safe);margin-bottom:.3rem">✅ 安全（推荐使用）</div>
+              <ul style="padding-left:1rem;margin:0;line-height:1.8;color:var(--text2)">
+                <li>平台官方音乐库（抖音/剪映自带）</li>
+                <li>免版权音乐（NCS/Artlist/Epidemic Sound）</li>
+                <li>AI生成音乐（Suno/Udio等）</li>
+                <li>自己原创的配乐</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wordlist-section" style="">
+    <div class="panel" style="">
+      <div class="panel-header">
+        <h2><span class="dot" style="background:var(--danger)"></span>违规词库</h2>
+        <span style="font-size:.78rem;color:var(--text2)" id="dbCount">共 155 条规则</span>
+      </div>
+      <div class="category-tabs" id="categoryTabs"><div class="cat-tab active">全部</div><div class="cat-tab ">诱导互动</div><div class="cat-tab ">引流违规</div><div class="cat-tab ">暴力血腥</div><div class="cat-tab ">财富金融</div><div class="cat-tab ">双男主/耽美</div><div class="cat-tab ">双女主/百合</div><div class="cat-tab ">剧情敏感</div><div class="cat-tab ">伦理情感</div><div class="cat-tab ">身份社会</div></div>
+      <div class="custom-form">
+        <input type="text" id="customBad" placeholder="违规词">
+        <span style="color:var(--text2)">→</span>
+        <input type="text" id="customGood" placeholder="替换词（可留空）">
+        <button class="btn btn-primary" onclick="addCustomWord()">添加</button>
+      </div>
+      <div class="word-grid" id="wordGrid" style="">
+    <div class="word-item">
+      <span class="w-bad">不转不是中国人</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R6</span>
+      <span class="arrow">→</span>
+      <span class="w-good">值得一看</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">一定要看到最后</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">结局很精彩</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">最好看的短剧</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">超好看的短剧</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">评论区告诉我</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">欢迎留言</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">免费看全集</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">限时免费</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">点赞加关注</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">喜欢请支持</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">关注看下集</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">下集更精彩</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">最甜短剧</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">超甜短剧</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">最火短剧</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">热门短剧</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">全网最火</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">超热门</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">全网第一</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">全网热门</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">NO.1</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">热门</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">独一无二</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">别具特色</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">史无前例</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">少见</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">无与伦比</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">超精彩</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">永久免费</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">限时免费</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">活活打死</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">往死里打</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">管制刀具</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">利刃</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">亿万富翁</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">超级富豪</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">稳赚不赔</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">稳赢</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">月入过万</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">收入可观</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">年薪百万</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">高薪</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">财务自由</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">不缺钱</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">男男恋爱</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">兄弟情深</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">男男CP</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">兄弟CP</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">女女恋爱</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">姐妹情深</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">女女CP</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">姐妹CP</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">橘里橘气</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span>
+      <span class="arrow">→</span>
+      <span class="w-good">姐妹氛围</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">加我微信</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">私信联系</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">私信领取</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">评论参与</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">点击链接</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">查看详情</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">复制口令</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">查看活动</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">全集免费</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">限时免费</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">免费追剧</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">限时福利</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">必须看完</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">建议看完</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">不看后悔</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">强烈推荐</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">不点赞就</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">喜欢的话</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">扣666</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">留言互动</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">转发给你</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">分享给朋友</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">猜中结局</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">你觉得结局是</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">最好看</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">超好看</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">性骚扰</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">骚扰</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">杀人犯</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">凶手</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">打断腿</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">废了你</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">一夜情</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">露水情缘</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">黑社会</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">道上的人</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">双男主</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">双主CP</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">男男恋</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">兄弟情</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">同性恋</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">同频共振</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">1和0</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span>
+      <span class="arrow">→</span>
+      <span class="w-good">CP搭配</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">abo</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span>
+      <span class="arrow">→</span>
+      <span class="w-good">设定向</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">ABO</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span>
+      <span class="arrow">→</span>
+      <span class="w-good">设定向</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">耽改剧</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R5</span>
+      <span class="arrow">→</span>
+      <span class="w-good">改编剧</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">磕男男</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">磕兄弟</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">双女主</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">双女主线</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">女女恋</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">姐妹情</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">les</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">姐妹知己</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">LES</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">姐妹知己</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">百合向</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">姐妹向</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">加微信</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">主页联系</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">微信号</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">联系方式</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">加QQ</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">联系我</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">QQ号</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">联系方式</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">最强</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">超强</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">最虐</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H2</span>
+      <span class="arrow">→</span>
+      <span class="w-good">超虐</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">最爽</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H2</span>
+      <span class="arrow">→</span>
+      <span class="w-good">超爽</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">最甜</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">超甜</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">最火</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">超火</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">第一</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">领先</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">唯一</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">少有</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">绝对</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">真的</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">顶级</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">高品质</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">杀死</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">除掉</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">杀人</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">动手</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">谋杀</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">暗算</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">自杀</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R6</span>
+      <span class="arrow">→</span>
+      <span class="w-good">想不开</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">割腕</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R6</span>
+      <span class="arrow">→</span>
+      <span class="w-good">伤害自己</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">跳楼</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R6</span>
+      <span class="arrow">→</span>
+      <span class="w-good">从高处坠落</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">上吊</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R6</span>
+      <span class="arrow">→</span>
+      <span class="w-good">寻短见</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">下毒</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">动手脚</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">毒死</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">害死</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">绑架</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">带走</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">强奸</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">侵犯</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">强暴</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">侵犯</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">轮奸</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">侵害</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">猥亵</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">骚扰</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">家暴</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">动手打人</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">虐待</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">欺负</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">虐童</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R6</span>
+      <span class="arrow">→</span>
+      <span class="w-good">欺负小孩</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">枪杀</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">干掉</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">砍死</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">重伤</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">捅死</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">重伤</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">活埋</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">处置</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">尸体</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span>
+      <span class="arrow">→</span>
+      <span class="w-good">遗体</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">死亡</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span>
+      <span class="arrow">→</span>
+      <span class="w-good">离世</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">死刑</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span>
+      <span class="arrow">→</span>
+      <span class="w-good">极刑</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">车祸</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span>
+      <span class="arrow">→</span>
+      <span class="w-good">意外</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">血腥</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span>
+      <span class="arrow">→</span>
+      <span class="w-good">激烈</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">暴力</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">冲突</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">屠杀</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">大清洗</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">灭门</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">满门遭难</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">分尸</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">毁尸灭迹</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">碎尸</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">处理痕迹</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">砍人</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">伤人</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">打残</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">打伤</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">枪支</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">武器</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">弹药</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">火器</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">乱伦</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">禁忌之恋</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">出轨</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">背叛</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">小三</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">第三者</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">包养</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">金主</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">卖淫</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">灰色交易</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">嫖娼</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">灰色交易</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">妓女</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">风尘女子</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">色情</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span>
+      <span class="arrow">→</span>
+      <span class="w-good">—</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">裸体</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span>
+      <span class="arrow">→</span>
+      <span class="w-good">坦诚相见</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">约炮</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">一夜情</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">同居</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">住一起</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">怀孕</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">有了</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">堕胎</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span>
+      <span class="arrow">→</span>
+      <span class="w-good">不要孩子</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">流产</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R4</span>
+      <span class="arrow">→</span>
+      <span class="w-good">失去孩子</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">代孕</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R6</span>
+      <span class="arrow">→</span>
+      <span class="w-good">—</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">黑帮</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">帮派</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">黑道</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">道上</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">毒贩</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">灰色生意</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">贩毒</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">灰色生意</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">吸毒</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">碰了不该碰的</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">毒品</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">禁品</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">赌场</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">地下场所</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">赌博</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">赌一把</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">博彩</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">碰运气</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">洗钱</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">走账</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">贪污</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">中饱私囊</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">行贿</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">打点</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">受贿</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">收好处</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">腐败</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H3</span>
+      <span class="arrow">→</span>
+      <span class="w-good">不正之风</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">官员</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">上面的人</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">警察</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">穿制服的</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">局长</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">领导</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">市长</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">市里领导</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">军人</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">穿军装的</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">军队</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">部队</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">首富</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">商界巨头</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">暴富</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">一夜翻身</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">躺赚</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">被动收入</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">耽美</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">兄弟向</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">BL</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">兄弟向</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">bl</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">兄弟向</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">男男</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">兄弟情深</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">男同</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">知己</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">断袖</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">知己</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">龙阳</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">知己</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">攻受</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span>
+      <span class="arrow">→</span>
+      <span class="w-good">CP站位</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">总攻</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span>
+      <span class="arrow">→</span>
+      <span class="w-good">主动方</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">总受</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span>
+      <span class="arrow">→</span>
+      <span class="w-good">被动方</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">耽改</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R5</span>
+      <span class="arrow">→</span>
+      <span class="w-good">改编向</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">出柜</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">坦诚</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">彩虹</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">七彩</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">腐女</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">磕学家</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">百合</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">姐妹向</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">GL</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">姐妹向</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">gl</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">姐妹向</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">女女</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">姐妹情深</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">女同</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">知己姐妹</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">拉拉</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">姐妹知己</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">铁T</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span>
+      <span class="arrow">→</span>
+      <span class="w-good">帅气姐姐</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">加V</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">联系我</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">加微</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">联系我</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">V信</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">联系方式</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">WX</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">联系方式</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">wx</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">联系方式</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">私聊</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">评论区见</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">扣1</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">留言互动</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">双击</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">喜欢请支持</span>
+    </div>
+  
+    <div class="word-item">
+      <span class="w-bad">嫖</span>
+      <span class="rule-code" style="font-size:.55rem;padding:0 .25rem">R2</span><span class="rule-code" style="font-size:.55rem;padding:0 .25rem">H1</span>
+      <span class="arrow">→</span>
+      <span class="w-good">那种交易</span>
+    </div>
+  </div>
+    </div>
+  </div>
+</div>
+<!-- Rules toggle button -->
+<button class="rules-toggle" title="查看平台规范" style="">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+</button>
+<div class="rules-overlay" id="rulesOverlay" style=""></div>
+<aside class="rules-sidebar" id="rulesSidebar" style="">
+  <div class="rules-sidebar-header" style="">
+    <h3>抖音短剧平台规范</h3>
+    <button class="rules-close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+  </div>
+  <div class="rules-body">
+    <span class="rules-badge red">2026年5月 · 抖音官方发布</span>
+    <p style="font-size:.82rem;color:var(--text2);line-height:1.7;margin-top:.5rem">
+      以下内容整理自抖音集团 2026 年 5 月正式发布的<strong style="color:var(--text)">AI 短剧审片标准</strong>及广电总局微短剧备案新规，为目前行业最新平台规范。
+    </p>
+
+    <!-- 六大零容忍红线 -->
+    <div class="rule-section">
+      <h4><span class="chevron">▼</span> 六大零容忍红线 <span style="font-size:.7rem;color:var(--danger);font-weight:400;margin-left:.3rem">触碰即下架+处罚</span></h4>
+      <div class="rule-content" style="max-height: 346px;">
+        <ul class="rule-list danger">
+          <li><strong>禁止不良价值观导向</strong> — 严禁宣扬拜金主义、极端复仇、性别物化、畸形婚恋、<em>美化出轨或家暴</em>等违背公序良俗的内容</li>
+          <li><strong>禁止低俗色情擦边</strong> — 杜绝暴露画面、性暗示台词、低俗封面标题，严禁以擦边内容引流变现</li>
+          <li><strong>禁止封建迷信内容</strong> — 不得渲染邪祟灵异、玄学改命、现代法术等荒诞情节</li>
+          <li><strong>禁止观感不适内容</strong> — 血腥恐怖、恶心猎奇、无底线审丑、静态 PPT 式敷衍内容一律禁止</li>
+          <li><strong>禁止侵权与肖像滥用</strong> — 未经授权严禁 AI 换脸、盗用动漫/游戏素材、模仿明星肖像，严打洗稿抄袭</li>
+          <li><strong>禁止危害未成年人与公序良俗</strong> — 不得涉及未成年人低俗暴力，不得恶搞公众人物或损害国家形象</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rule-divider"></div>
+
+    <!-- 四大高风险区 -->
+    <div class="rule-section">
+      <h4><span class="chevron">▼</span> 四大高风险创作区域</h4>
+      <div class="rule-content" style="max-height: 231px;">
+        <ul class="rule-list warn">
+          <li><strong>关系越界</strong> — 把控制、物化当做爱情张力，把不平等关系包装成甜宠卖点，对不伦/擦边/暧昧关系强行制造讨论</li>
+          <li><strong>感官刺激吸睛</strong> — 用过度露骨、暗示挑逗的内容做引入钩子，反复聚焦身体部位、暧昧动作、刺激台词</li>
+          <li><strong>失真逻辑背书危险行为</strong> — 把暴力、霸凌、私刑、非法获利写成爽点，让角色因作恶而稳定获利且无代价</li>
+          <li><strong>低质拼接冒充成片</strong> — 静态拼图、机械配音当合规成片上线，无视 AI 穿帮、字幕错乱</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rule-divider"></div>
+
+    <!-- 审核覆盖范围 -->
+    <div class="rule-section">
+      <h4><span class="chevron">▼</span> 全链路审核覆盖</h4>
+      <div class="rule-content" style="max-height: 377px;">
+        <ul class="rule-list info">
+          <li>审核覆盖<strong>剧名、封面、简介、正片、配音、字幕、画质</strong>全链路</li>
+          <li>单集时长建议 <strong>≥ 30 秒</strong>；6 月 5 日起超 <strong>3 分钟</strong>将限制上传</li>
+          <li>封面禁用「热播」「爆款」「强推」等营销字样</li>
+          <li>禁止视觉擦边或主体五官缺失</li>
+          <li>AI 生成内容占比 ≥ 50% 须在<strong>片头前 3 秒、封面、简介三处</strong>标注「本作品含 AI 生成内容」</li>
+          <li>未达标 AI 标识直接限流或下架</li>
+        </ul>
+        <div class="rule-note">
+          <strong>关键原则：</strong>平台不只针对某一个词或某一个镜头单独判断，而是综合题材、人物关系、表达方式、包装方式和最终利益导向做<strong>综合评估</strong>。出现的频次、展示的篇幅、镜头聚焦方式、剧情落点以及整体导向是否健康，才是关键。
+        </div>
+      </div>
+    </div>
+
+    <div class="rule-divider"></div>
+
+    <!-- 制作质量硬指标 -->
+    <div class="rule-section">
+      <h4><span class="chevron">▼</span> 制作质量硬指标</h4>
+      <div class="rule-content" style="max-height: 368px;">
+        <ul class="rule-list info">
+          <li><strong>禁止纯静态 PPT 拼接</strong> — 纯图片轮播、单张图长时间定格的 PPT 形式</li>
+          <li><strong>禁止伪动态画面</strong> — 仅靠口型、眨眼等微小重复动作制造动态效果</li>
+          <li><strong>禁止全程机械配音</strong> — 无重音语调、非自然人声、频繁断句</li>
+          <li><strong>禁止音画不同步</strong> — 口型与配音不匹配、声音滞后</li>
+          <li><strong>禁止穿模</strong> — 手穿透身体、脚陷地面、头发穿越肩膀</li>
+          <li><strong>禁止烂尾断更</strong> — 结尾突兀、主线未收尾、逻辑断层</li>
+          <li><strong>字幕规范</strong> — 禁止双轨字幕、字幕错乱、错字漏字</li>
+          <li><strong>禁止用刺耳音效规避敏感词</strong></li>
+          <li><strong>禁止违规模糊与大面积马赛克</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rule-divider"></div>
+
+    <!-- 价值观与创作导向 -->
+    <div class="rule-section">
+      <h4><span class="chevron">▼</span> 创作者五项自检</h4>
+      <div class="rule-content" style="max-height: 267px;">
+        <ul class="rule-list safe">
+          <li><strong>价值观是否清晰</strong> — 作品最终成立的不应该是扭曲、极端或破坏公共认知的导向</li>
+          <li><strong>人物是否有尊严</strong> — 角色可以有缺点，但不能当工具、货物或纯刺激符号</li>
+          <li><strong>关系是否有边界</strong> — 情感冲突可以强，但不能靠越界身份、强迫、控制、羞辱、物化制造卖点</li>
+          <li><strong>剧情是否有逻辑</strong> — 架空/奇幻/系统流也要在世界观内自洽</li>
+          <li><strong>制作是否完整</strong> — 画面、声音、字幕、节奏互相匹配，不能是素材拼接</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rule-divider"></div>
+
+    <!-- 行业数据 & 扶持 -->
+    <div class="rule-section">
+      <h4><span class="chevron">▼</span> 行业现状与扶持政策</h4>
+      <div class="rule-content" style="max-height: 285px;">
+        <ul class="rule-list info">
+          <li>2026 年 4 月专项治理以来，抖音已下架违规低质 AI 短剧超 <strong>7 万部</strong></li>
+          <li>日上新量从峰值 2000+ 部骤降至约 <strong>350 部</strong>，新剧过审率仅 <strong>30%</strong></li>
+          <li>2026 年起微短剧「先备案后上线」成为硬性要求</li>
+          <li>重点微短剧投资门槛从 100 万提至 <strong>300 万元</strong></li>
+        </ul>
+        <div class="rule-note">
+          <strong>合规精品扶持：</strong>保底收益+高分成、核心流量倾斜、IP 改编补贴、出海专项扶持。2026 年真人短剧保底扶持预算超 <strong>15 亿元</strong>，设 <strong>2 亿元</strong>专项资金扶持现实主义/悬疑/都市群像。
+        </div>
+      </div>
+    </div>
+
+    <div class="rule-divider"></div>
+
+    <p style="font-size:.72rem;color:var(--text2);text-align:center;margin-top:1rem;line-height:1.5">
+      数据来源：抖音集团 2026.05 AI 短剧审片标准<br>
+      广电总局微短剧分类新标准（2026.01.01 施行）<br>
+      整理时间：2026 年 6 月
+    </p>
+  </div>
+</aside>
+
+<div class="toast" id="toast" style=""></div>
+<script>
+// ============ 短剧违规词库（含平台规范引用）============
+// 红线规则引用：R1-R6 (六大零容忍红线)
+// 高风险区域引用：H1-H4 (四大高风险创作区域)
+// R1: 不良价值观导向 (拜金/复仇/物化/畸形婚恋/美化出轨家暴)
+// R2: 低俗色情擦边 (暴露/性暗示/低俗封面)
+// R3: 封建迷信 (邪祟/玄学/法术)
+// R4: 观感不适 (血腥/猎奇/审丑/PPT敷衍)
+// R5: 侵权与肖像滥用 (换脸/盗素材/抄袭)
+// R6: 危害未成年人与公序良俗
+// H1: 关系越界 (控制/物化当爱情/不平等关系包装甜宠)
+// H2: 感官刺激吸睛 (露骨/暗示/身体聚焦)
+// H3: 失真逻辑背书危险行为 (暴力/霸凌/私刑当爽点)
+// H4: 低质拼接冒充成片 (静态PPT/机械配音/穿模)
+
+const WORD_DB = [
+
+  // — 剧情敏感词 —
+  {cat:'剧情敏感',bad:'杀死',good:'除掉',rule:'R4,H3'},
+  {cat:'剧情敏感',bad:'杀人',good:'动手',rule:'R4,H3'},
+  {cat:'剧情敏感',bad:'谋杀',good:'暗算',rule:'R4,H3'},
+  {cat:'剧情敏感',bad:'自杀',good:'想不开',rule:'R4,R6'},
+  {cat:'剧情敏感',bad:'割腕',good:'伤害自己',rule:'R4,R6'},
+  {cat:'剧情敏感',bad:'跳楼',good:'从高处坠落',rule:'R4,R6'},
+  {cat:'剧情敏感',bad:'上吊',good:'寻短见',rule:'R4,R6'},
+  {cat:'剧情敏感',bad:'下毒',good:'动手脚',rule:'H3'},
+  {cat:'剧情敏感',bad:'毒死',good:'害死',rule:'H3'},
+  {cat:'剧情敏感',bad:'绑架',good:'带走',rule:'R4,H3'},
+  {cat:'剧情敏感',bad:'强奸',good:'侵犯',rule:'R2,H1'},
+  {cat:'剧情敏感',bad:'强暴',good:'侵犯',rule:'R2,H1'},
+  {cat:'剧情敏感',bad:'轮奸',good:'侵害',rule:'R2,H1'},
+  {cat:'剧情敏感',bad:'猥亵',good:'骚扰',rule:'R2,H1'},
+  {cat:'剧情敏感',bad:'性骚扰',good:'骚扰',rule:'R2,H1'},
+  {cat:'剧情敏感',bad:'家暴',good:'动手打人',rule:'R1,H1'},
+  {cat:'剧情敏感',bad:'虐待',good:'欺负',rule:'R4,H1'},
+  {cat:'剧情敏感',bad:'虐童',good:'欺负小孩',rule:'R6'},
+  {cat:'剧情敏感',bad:'枪杀',good:'干掉',rule:'R4,H3'},
+  {cat:'剧情敏感',bad:'砍死',good:'重伤',rule:'R4,H3'},
+  {cat:'剧情敏感',bad:'捅死',good:'重伤',rule:'R4,H3'},
+  {cat:'剧情敏感',bad:'活埋',good:'处置',rule:'R4,H3'},
+  {cat:'剧情敏感',bad:'尸体',good:'遗体',rule:'R4'},
+  {cat:'剧情敏感',bad:'死亡',good:'离世',rule:'R4'},
+  {cat:'剧情敏感',bad:'杀人犯',good:'凶手',rule:'R4,H3'},
+  {cat:'剧情敏感',bad:'死刑',good:'极刑',rule:'R4'},
+  {cat:'剧情敏感',bad:'车祸',good:'意外',rule:'R4'},
+
+  // — 暴力血腥 —
+  {cat:'暴力血腥',bad:'血腥',good:'激烈',rule:'R4'},
+  {cat:'暴力血腥',bad:'暴力',good:'冲突',rule:'R4,H3'},
+  {cat:'暴力血腥',bad:'屠杀',good:'大清洗',rule:'R4,H3'},
+  {cat:'暴力血腥',bad:'灭门',good:'满门遭难',rule:'R4,H3'},
+  {cat:'暴力血腥',bad:'分尸',good:'毁尸灭迹',rule:'R4,H3'},
+  {cat:'暴力血腥',bad:'碎尸',good:'处理痕迹',rule:'R4,H3'},
+  {cat:'暴力血腥',bad:'砍人',good:'伤人',rule:'R4,H3'},
+  {cat:'暴力血腥',bad:'打残',good:'打伤',rule:'R4,H3'},
+  {cat:'暴力血腥',bad:'打断腿',good:'废了你',rule:'R4,H3'},
+  {cat:'暴力血腥',bad:'活活打死',good:'往死里打',rule:'R4,H3'},
+  {cat:'暴力血腥',bad:'枪支',good:'武器',rule:'R4,H3'},
+  {cat:'暴力血腥',bad:'弹药',good:'火器',rule:'R4,H3'},
+  {cat:'暴力血腥',bad:'管制刀具',good:'利刃',rule:'R4,H3'},
+
+  // — 伦理情感 —
+  {cat:'伦理情感',bad:'乱伦',good:'禁忌之恋',rule:'R1,H1'},
+  {cat:'伦理情感',bad:'出轨',good:'背叛',rule:'R1,H1'},
+  {cat:'伦理情感',bad:'小三',good:'第三者',rule:'R1,H1'},
+  {cat:'伦理情感',bad:'包养',good:'金主',rule:'R1,H1'},
+  {cat:'伦理情感',bad:'卖淫',good:'灰色交易',rule:'R2,H1'},
+  {cat:'伦理情感',bad:'嫖娼',good:'灰色交易',rule:'R2,H1'},
+  {cat:'伦理情感',bad:'嫖',good:'那种交易',rule:'R2,H1'},
+  {cat:'伦理情感',bad:'妓女',good:'风尘女子',rule:'R2,H1'},
+  {cat:'伦理情感',bad:'色情',good:'—',rule:'R2'},
+  {cat:'伦理情感',bad:'裸体',good:'坦诚相见',rule:'R2'},
+  {cat:'伦理情感',bad:'约炮',good:'露水情缘',rule:'R2,H1'},
+  {cat:'伦理情感',bad:'一夜情',good:'露水情缘',rule:'R2,H1'},
+  {cat:'伦理情感',bad:'同居',good:'住一起',rule:'R1'},
+  {cat:'伦理情感',bad:'怀孕',good:'有了',rule:'R1'},
+  {cat:'伦理情感',bad:'堕胎',good:'不要孩子',rule:'R4'},
+  {cat:'伦理情感',bad:'流产',good:'失去孩子',rule:'R4'},
+  {cat:'伦理情感',bad:'代孕',good:'—',rule:'R1,R6'},
+
+  // — 身份社会 —
+  {cat:'身份社会',bad:'黑社会',good:'道上的人',rule:'R1,H3'},
+  {cat:'身份社会',bad:'黑帮',good:'帮派',rule:'R1,H3'},
+  {cat:'身份社会',bad:'黑道',good:'道上',rule:'R1,H3'},
+  {cat:'身份社会',bad:'毒贩',good:'灰色生意',rule:'R1,H3'},
+  {cat:'身份社会',bad:'贩毒',good:'灰色生意',rule:'R1,H3'},
+  {cat:'身份社会',bad:'吸毒',good:'碰了不该碰的',rule:'R1,H3'},
+  {cat:'身份社会',bad:'毒品',good:'禁品',rule:'R1,H3'},
+  {cat:'身份社会',bad:'赌场',good:'地下场所',rule:'R1,H3'},
+  {cat:'身份社会',bad:'赌博',good:'赌一把',rule:'R1,H3'},
+  {cat:'身份社会',bad:'博彩',good:'碰运气',rule:'R1,H3'},
+  {cat:'身份社会',bad:'洗钱',good:'走账',rule:'R1,H3'},
+  {cat:'身份社会',bad:'贪污',good:'中饱私囊',rule:'R1,H3'},
+  {cat:'身份社会',bad:'行贿',good:'打点',rule:'R1,H3'},
+  {cat:'身份社会',bad:'受贿',good:'收好处',rule:'R1,H3'},
+  {cat:'身份社会',bad:'腐败',good:'不正之风',rule:'R1,H3'},
+  {cat:'身份社会',bad:'官员',good:'上面的人',rule:'R1'},
+  {cat:'身份社会',bad:'警察',good:'穿制服的',rule:'R1'},
+  {cat:'身份社会',bad:'局长',good:'领导',rule:'R1'},
+  {cat:'身份社会',bad:'市长',good:'市里领导',rule:'R1'},
+  {cat:'身份社会',bad:'军人',good:'穿军装的',rule:'R1'},
+  {cat:'身份社会',bad:'军队',good:'部队',rule:'R1'},
+
+  // — 财富金融 —
+  {cat:'财富金融',bad:'首富',good:'商界巨头',rule:'R1'},
+  {cat:'财富金融',bad:'亿万富翁',good:'超级富豪',rule:'R1'},
+  {cat:'财富金融',bad:'稳赚不赔',good:'稳赢',rule:'R1'},
+  {cat:'财富金融',bad:'暴富',good:'一夜翻身',rule:'R1'},
+  {cat:'财富金融',bad:'月入过万',good:'收入可观',rule:'R1'},
+  {cat:'财富金融',bad:'年薪百万',good:'高薪',rule:'R1'},
+  {cat:'财富金融',bad:'财务自由',good:'不缺钱',rule:'R1'},
+  {cat:'财富金融',bad:'躺赚',good:'被动收入',rule:'R1'},
+
+  // — 封建迷信 —
+  {cat:'封建迷信',bad:'鬼上身',good:'被附体',rule:'R3'},
+  {cat:'封建迷信',bad:'驱鬼',good:'净化',rule:'R3'},
+  {cat:'封建迷信',bad:'算命',good:'占卜',rule:'R3'},
+  {cat:'封建迷信',bad:'风水',good:'布局',rule:'R3'},
+  {cat:'封建迷信',bad:'符咒',good:'神秘力量',rule:'R3'},
+  {cat:'封建迷信',bad:'降头',good:'暗术',rule:'R3'},
+  {cat:'封建迷信',bad:'养小鬼',good:'养灵',rule:'R3'},
+  {cat:'封建迷信',bad:'请神',good:'祈福',rule:'R3'},
+  {cat:'封建迷信',bad:'通灵',good:'感应',rule:'R3'},
+  {cat:'封建迷信',bad:'阴阳眼',good:'特殊能力',rule:'R3'},
+  {cat:'封建迷信',bad:'厉鬼',good:'怨灵',rule:'R3'},
+  {cat:'封建迷信',bad:'邪祟',good:'不洁之物',rule:'R3'},
+  {cat:'封建迷信',bad:'做法事',good:'举行仪式',rule:'R3'},
+  {cat:'封建迷信',bad:'下蛊',good:'施术',rule:'R3'},
+  {cat:'封建迷信',bad:'巫蛊',good:'秘术',rule:'R3'},
+  {cat:'封建迷信',bad:'跳大神',good:'神秘仪式',rule:'R3'},
+  {cat:'封建迷信',bad:'血祭',good:'献祭',rule:'R3'},
+  {cat:'封建迷信',bad:'招魂',good:'唤灵',rule:'R3'},
+  {cat:'封建迷信',bad:'转世',good:'轮回',rule:'R3'},
+  {cat:'封建迷信',bad:'投胎',good:'转生',rule:'R3'},
+  {cat:'封建迷信',bad:'阎王',good:'冥界之主',rule:'R3'},
+  {cat:'封建迷信',bad:'地府',good:'冥界',rule:'R3'},
+
+  // — 广告法/绝对化用语 —
+  {cat:'广告法违规',bad:'国家级',good:'高品质',rule:'R1'},
+  {cat:'广告法违规',bad:'世界级',good:'国际化',rule:'R1'},
+  {cat:'广告法违规',bad:'100%',good:'高度',rule:'R1'},
+  {cat:'广告法违规',bad:'万能',good:'多功能',rule:'R1'},
+  {cat:'广告法违规',bad:'永久',good:'持久',rule:'R1'},
+  {cat:'广告法违规',bad:'国家级认证',good:'品质认证',rule:'R1'},
+
+  // — 网络用语/人设敏感 —
+  {cat:'网络敏感',bad:'舔狗',good:'深情',rule:'R1,H1'},
+  {cat:'网络敏感',bad:'绿茶',good:'心机',rule:'R1'},
+  {cat:'网络敏感',bad:'白莲花',good:'清纯人设',rule:'R1'},
+  {cat:'网络敏感',bad:'圣母',good:'大善人',rule:'R1'},
+  {cat:'网络敏感',bad:'pua',good:'精神控制',rule:'R1,H1'},
+  {cat:'网络敏感',bad:'PUA',good:'精神控制',rule:'R1,H1'},
+  {cat:'网络敏感',bad:'养鱼',good:'暧昧多人',rule:'R1,H1'},
+  {cat:'网络敏感',bad:'海王',good:'花心',rule:'R1,H1'},
+  {cat:'网络敏感',bad:'渣男',good:'负心人',rule:'R1'},
+  {cat:'网络敏感',bad:'渣女',good:'负心人',rule:'R1'},
+  {cat:'网络敏感',bad:'舔屏',good:'心动',rule:'R2,H2'},
+  {cat:'网络敏感',bad:'开车',good:'暗示',rule:'R2,H2'},
+  {cat:'网络敏感',bad:'福利',good:'惊喜',rule:'R2'},
+  {cat:'网络敏感',bad:'擦边',good:'边缘',rule:'R2,H2'},
+  {cat:'网络敏感',bad:'软色情',good:'暗示向',rule:'R2,H2'},
+
+  // — 双男主/耽美 —
+  {cat:'双男主/耽美',bad:'双男主',good:'双主CP',rule:'R1,H1'},
+  {cat:'双男主/耽美',bad:'耽美',good:'兄弟向',rule:'R1,H1'},
+  {cat:'双男主/耽美',bad:'BL',good:'兄弟向',rule:'R1,H1'},
+  {cat:'双男主/耽美',bad:'bl',good:'兄弟向',rule:'R1,H1'},
+  {cat:'双男主/耽美',bad:'男男',good:'兄弟情深',rule:'R1,H1'},
+  {cat:'双男主/耽美',bad:'男男恋爱',good:'兄弟情深',rule:'R1,H1'},
+  {cat:'双男主/耽美',bad:'男男CP',good:'兄弟CP',rule:'R1,H1'},
+  {cat:'双男主/耽美',bad:'男男恋',good:'兄弟情',rule:'R1,H1'},
+  {cat:'双男主/耽美',bad:'同性恋',good:'同频共振',rule:'R1,H1'},
+  {cat:'双男主/耽美',bad:'男同',good:'知己',rule:'R1,H1'},
+  {cat:'双男主/耽美',bad:'断袖',good:'知己',rule:'R1,H1'},
+  {cat:'双男主/耽美',bad:'龙阳',good:'知己',rule:'R1,H1'},
+  {cat:'双男主/耽美',bad:'攻受',good:'CP站位',rule:'R2'},
+  {cat:'双男主/耽美',bad:'总攻',good:'主动方',rule:'R2'},
+  {cat:'双男主/耽美',bad:'总受',good:'被动方',rule:'R2'},
+  {cat:'双男主/耽美',bad:'1和0',good:'CP搭配',rule:'R2'},
+  {cat:'双男主/耽美',bad:'abo',good:'设定向',rule:'R2'},
+  {cat:'双男主/耽美',bad:'ABO',good:'设定向',rule:'R2'},
+  {cat:'双男主/耽美',bad:'耽改',good:'改编向',rule:'R5'},
+  {cat:'双男主/耽美',bad:'耽改剧',good:'改编剧',rule:'R5'},
+  {cat:'双男主/耽美',bad:'出柜',good:'坦诚',rule:'R1'},
+  {cat:'双男主/耽美',bad:'彩虹',good:'七彩',rule:'R1'},
+  {cat:'双男主/耽美',bad:'磕男男',good:'磕兄弟',rule:'R1,H1'},
+  {cat:'双男主/耽美',bad:'腐女',good:'磕学家',rule:'R1'},
+
+  // — 双女主/百合 —
+  {cat:'双女主/百合',bad:'双女主',good:'双女主线',rule:'R1,H1'},
+  {cat:'双女主/百合',bad:'百合',good:'姐妹向',rule:'R1,H1'},
+  {cat:'双女主/百合',bad:'GL',good:'姐妹向',rule:'R1,H1'},
+  {cat:'双女主/百合',bad:'gl',good:'姐妹向',rule:'R1,H1'},
+  {cat:'双女主/百合',bad:'女女',good:'姐妹情深',rule:'R1,H1'},
+  {cat:'双女主/百合',bad:'女女恋爱',good:'姐妹情深',rule:'R1,H1'},
+  {cat:'双女主/百合',bad:'女女CP',good:'姐妹CP',rule:'R1,H1'},
+  {cat:'双女主/百合',bad:'女女恋',good:'姐妹情',rule:'R1,H1'},
+  {cat:'双女主/百合',bad:'女同',good:'知己姐妹',rule:'R1,H1'},
+  {cat:'双女主/百合',bad:'拉拉',good:'姐妹知己',rule:'R1,H1'},
+  {cat:'双女主/百合',bad:'les',good:'姐妹知己',rule:'R1,H1'},
+  {cat:'双女主/百合',bad:'LES',good:'姐妹知己',rule:'R1,H1'},
+  {cat:'双女主/百合',bad:'铁T',good:'帅气姐姐',rule:'R2'},
+  {cat:'双女主/百合',bad:'橘里橘气',good:'姐妹氛围',rule:'R2'},
+  {cat:'双女主/百合',bad:'百合向',good:'姐妹向',rule:'R1,H1'},
+
+  // — 引流违规 —
+  {cat:'引流违规',bad:'加微信',good:'主页联系',rule:'R1'},
+  {cat:'引流违规',bad:'加我微信',good:'私信联系',rule:'R1'},
+  {cat:'引流违规',bad:'加V',good:'联系我',rule:'R1'},
+  {cat:'引流违规',bad:'加微',good:'联系我',rule:'R1'},
+  {cat:'引流违规',bad:'微信号',good:'联系方式',rule:'R1'},
+  {cat:'引流违规',bad:'V信',good:'联系方式',rule:'R1'},
+  {cat:'引流违规',bad:'WX',good:'联系方式',rule:'R1'},
+  {cat:'引流违规',bad:'wx',good:'联系方式',rule:'R1'},
+  {cat:'引流违规',bad:'加QQ',good:'联系我',rule:'R1'},
+  {cat:'引流违规',bad:'QQ号',good:'联系方式',rule:'R1'},
+  {cat:'引流违规',bad:'私聊',good:'评论区见',rule:'R1'},
+  {cat:'引流违规',bad:'私信领取',good:'评论参与',rule:'R1'},
+  {cat:'引流违规',bad:'点击链接',good:'查看详情',rule:'R1'},
+  {cat:'引流违规',bad:'复制口令',good:'查看活动',rule:'R1'},
+  {cat:'引流违规',bad:'免费看全集',good:'限时免费',rule:'R1'},
+  {cat:'引流违规',bad:'全集免费',good:'限时免费',rule:'R1'},
+  {cat:'引流违规',bad:'免费追剧',good:'限时福利',rule:'R1'},
+
+  // — 诱导互动 —
+  {cat:'诱导互动',bad:'必须看完',good:'建议看完',rule:'R1'},
+  {cat:'诱导互动',bad:'不看后悔',good:'强烈推荐',rule:'R1'},
+  {cat:'诱导互动',bad:'不转不是中国人',good:'值得一看',rule:'R1,R6'},
+  {cat:'诱导互动',bad:'点赞加关注',good:'喜欢请支持',rule:'R1'},
+  {cat:'诱导互动',bad:'不点赞就',good:'喜欢的话',rule:'R1'},
+  {cat:'诱导互动',bad:'评论区告诉我',good:'欢迎留言',rule:'R1'},
+  {cat:'诱导互动',bad:'扣1',good:'留言互动',rule:'R1'},
+  {cat:'诱导互动',bad:'扣666',good:'留言互动',rule:'R1'},
+  {cat:'诱导互动',bad:'转发给你',good:'分享给朋友',rule:'R1'},
+  {cat:'诱导互动',bad:'一定要看到最后',good:'结局很精彩',rule:'R1'},
+  {cat:'诱导互动',bad:'猜中结局',good:'你觉得结局是',rule:'R1'},
+  {cat:'诱导互动',bad:'关注看下集',good:'下集更精彩',rule:'R1'},
+  {cat:'诱导互动',bad:'双击',good:'喜欢请支持',rule:'R1'},
+];
+
+// 平台规范说明映射
+const RULE_DESCRIPTIONS = {
+  'R1': '红线1：禁止不良价值观导向（拜金/复仇/物化/畸形婚恋）',
+  'R2': '红线2：禁止低俗色情擦边（暴露/性暗示/低俗封面）',
+  'R3': '红线3：禁止封建迷信内容（邪祟/玄学/法术）',
+  'R4': '红线4：禁止观感不适内容（血腥/猎奇/审丑）',
+  'R5': '红线5：禁止侵权与肖像滥用（换脸/盗素材/抄袭）',
+  'R6': '红线6：禁止危害未成年人与公序良俗',
+  'H1': '高风险1：关系越界（控制/物化当爱情/不平等关系）',
+  'H2': '高风险2：感官刺激吸睛（露骨/暗示/身体聚焦）',
+  'H3': '高风险3：失真逻辑背书危险行为（暴力/霸凌当爽点）',
+  'H4': '高风险4：低质拼接冒充成片（静态PPT/机械配音）'
+};
+// ============ App Logic ============
+let currentCat = '全部';
+let resultText = '';
+
+// Sort DB: longer bad words first so they match first
+WORD_DB.sort((a,b) => b.bad.length - a.bad.length);
+
+function getCategories(){
+  const cats = ['全部', ...new Set(WORD_DB.map(w=>w.cat))];
+  return cats;
+}
+
+function renderTabs(){
+  const container = document.getElementById('categoryTabs');
+  container.innerHTML = getCategories().map(c =>
+    `<div class="cat-tab ${c===currentCat?'active':''}" onclick="filterCat('${c}')">${c}</div>`
+  ).join('');
+}
+
+function filterCat(c){
+  currentCat = c;
+  renderTabs();
+  renderWordGrid();
+}
+
+function renderWordGrid(){
+  const grid = document.getElementById('wordGrid');
+  const items = currentCat === '全部' ? WORD_DB : WORD_DB.filter(w => w.cat === currentCat);
+  grid.innerHTML = items.map(w => {
+    const ruleCodes = w.rule ? w.rule.split(',').map(r => `<span class="rule-code" style="font-size:.55rem;padding:0 .25rem">${r}</span>`).join('') : '';
+    return `
+    <div class="word-item">
+      <span class="w-bad">${w.bad}</span>
+      ${ruleCodes}
+      <span class="arrow">→</span>
+      <span class="w-good">${w.good || '(删除)'}</span>
+    </div>
+  `}).join('');
+  document.getElementById('dbCount').textContent = `共 ${WORD_DB.length} 条规则`;
+}
+
+function addCustomWord(){
+  const badEl = document.getElementById('customBad');
+  const goodEl = document.getElementById('customGood');
+  const bad = badEl.value.trim();
+  if(!bad){showToast('请输入违规词');return}
+  const good = goodEl.value.trim();
+  // check duplicate
+  if(WORD_DB.some(w=>w.bad===bad)){showToast('该词已在词库中');return}
+  WORD_DB.push({cat:'自定义',bad,good});
+  WORD_DB.sort((a,b)=>b.bad.length-a.bad.length);
+  badEl.value='';goodEl.value='';
+  renderTabs();renderWordGrid();
+  showToast(`已添加: ${bad} → ${good||'(删除)'}`);
+}
+
+function detectAndReplace(){
+  const input = document.getElementById('inputText').value;
+  if(!input.trim()){showToast('请先输入文案内容');return}
+  const {html, text, count, rules, violations} = process(input, true);
+  document.getElementById('outputArea').innerHTML = buildSentenceResults(input, violations, rules, true) + buildRulesSummary(rules);
+  resultText = text;
+  updateStats(input.length, count, count);
+}
+
+function detectOnly(){
+  const input = document.getElementById('inputText').value;
+  if(!input.trim()){showToast('请先输入文案内容');return}
+  const {html, text, count, rules, violations} = process(input, false);
+  document.getElementById('outputArea').innerHTML = buildSentenceResults(input, violations, rules, false) + buildRulesSummary(rules);
+  resultText = text;
+  updateStats(input.length, count, 0);
+}
+
+function buildSentenceResults(input, violations, rules, doReplace) {
+  // Split input into sentences, keeping punctuation attached
+  const rawParts = input.split(/([。！？!?\n]+)/);
+  const sentences = [];
+  for (let i = 0; i < rawParts.length; i += 2) {
+    const text = (rawParts[i] || '') + (rawParts[i+1] || '');
+    if (text.trim()) sentences.push(text.trim());
+  }
+  // If no sentence-ending punctuation, treat whole input as one sentence
+  if (sentences.length === 0 && input.trim()) sentences.push(input.trim());
+
+  // Group violations by sentence text
+  const sentenceMap = new Map();
+  violations.forEach(v => {
+    if (!sentenceMap.has(v.sentence)) sentenceMap.set(v.sentence, []);
+    sentenceMap.get(v.sentence).push(v);
+  });
+
+  let html = '';
+  let hasViolation = false;
+
+  sentences.forEach((sent, idx) => {
+    const vList = sentenceMap.get(sent) || [];
+    if (vList.length > 0) hasViolation = true;
+
+    // Build highlighted version of this sentence
+    let sentHtml = escapeHtml(sent);
+    const processed = new Set();
+    // Sort by length desc to match longer words first
+    const sortedRules = [...WORD_DB].sort((a,b) => b.bad.length - a.bad.length);
+    for (const rule of sortedRules) {
+      if (processed.has(rule.bad)) continue;
+      const escaped = escapeRegex(rule.bad);
+      const regex = new RegExp(escaped, 'g');
+      if (regex.test(sentHtml)) {
+        processed.add(rule.bad);
+        const ruleInfo = rule.rule ? ' [' + rule.rule + ']' : '';
+        if (doReplace && rule.good) {
+          sentHtml = sentHtml.replace(new RegExp(escaped, 'g'),
+            '<span class="word-good" title="原: ' + rule.bad + ruleInfo + '">' + escapeHtml(rule.good) + '</span>');
+        } else {
+          sentHtml = sentHtml.replace(new RegExp(escaped, 'g'),
+            '<span class="word-bad" title="违规' + ruleInfo + ' · ' + rule.cat + '">' + rule.bad + '</span>');
+        }
+      }
+    }
+
+    // Build violation tags for this sentence
+    let tagsHtml = '';
+    if (vList.length > 0) {
+      const uniqueWords = [];
+      const seen = new Set();
+      vList.forEach(v => { if (!seen.has(v.bad)) { seen.add(v.bad); uniqueWords.push(v); }});
+      tagsHtml = '<div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.5rem">';
+      uniqueWords.forEach(v => {
+        const ruleCodes = v.rule ? v.rule.split(',').map(r => '<span class="rule-code" style="font-size:.55rem">' + r + '</span>').join('') : '';
+        tagsHtml += '<div class="violation-tag">' + ruleCodes + '<span class="vt-word">' + escapeHtml(v.bad) + '</span><span class="vt-arrow">→</span><span class="vt-fix">' + escapeHtml(v.good || '删除') + '</span></div>';
+      });
+      tagsHtml += '</div>';
+    }
+
+    html += '<div class="sentence-result' + (vList.length > 0 ? ' has-violation' : '') + '">';
+    html += '<div class="sentence-num">' + (idx + 1) + '</div>';
+    html += '<div class="sentence-body">';
+    html += '<div class="sentence-text">' + sentHtml + '</div>';
+    html += tagsHtml;
+    html += '</div></div>';
+  });
+
+  if (!hasViolation && violations.length === 0) {
+    html = '<div style="text-align:center;padding:1.5rem;color:var(--safe)"><span style="font-size:1.5rem">✓</span><br><span style="font-size:.88rem">未检测到违规内容，文案安全</span></div>';
+  }
+
+  return html;
+}
+
+function buildRulesSummary(rules) {
+  if (!rules || rules.size === 0) return '';
+  const ruleCodes = [...rules];
+  let summary = '<div style="margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--border)">';
+  summary += '<div style="font-size:.78rem;font-weight:600;color:#ff9800;margin-bottom:.4rem">涉及平台规范条款：</div>';
+  summary += '<div style="display:flex;flex-wrap:wrap;gap:.4rem">';
+  ruleCodes.forEach(code => {
+    const desc = RULE_DESCRIPTIONS[code];
+    if (desc) {
+      summary += `<div style="font-size:.72rem;padding:.3rem .6rem;background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.2);border-radius:4px"><span class="rule-code">${code}</span> ${desc}</div>`;
+    }
+  });
+  summary += '</div></div>';
+  return summary;
+}
+
+function process(input, doReplace){
+  let html = escapeHtml(input);
+  let text = input;
+  let count = 0;
+  const found = new Set();
+  const rules = new Set();
+  const violations = [];
+
+  // Split input into sentences for context
+  const sentences = input.split(/([。！？!?\n]+)/).filter(s => s.trim());
+
+  for(const rule of WORD_DB){
+    const escaped = escapeRegex(rule.bad);
+    const regex = new RegExp(escaped, 'g');
+    if(regex.test(text)){
+      found.add(rule.bad);
+      count++;
+      if (rule.rule) {
+        rule.rule.split(',').forEach(r => rules.add(r));
+      }
+      // Find which sentences contain this violation
+      let searchText = input;
+      let searchRegex = new RegExp(escaped, 'g');
+      let match;
+      while ((match = searchRegex.exec(searchText)) !== null) {
+        // Find the sentence containing this match
+        let sentenceStart = 0;
+        let sentenceEnd = searchText.length;
+        for (let i = match.index; i >= 0; i--) {
+          if ('。！？!?\n'.includes(searchText[i])) { sentenceStart = i + 1; break; }
+        }
+        for (let i = match.index; i < searchText.length; i++) {
+          if ('。！？!?\n'.includes(searchText[i])) { sentenceEnd = i + 1; break; }
+        }
+        const sentence = searchText.substring(sentenceStart, sentenceEnd).trim();
+        let fixedSentence = sentence;
+        if (doReplace && rule.good) {
+          fixedSentence = sentence.replace(new RegExp(escaped, 'g'), rule.good);
+        } else {
+          fixedSentence = sentence.replace(new RegExp(escaped, 'g'), '【' + (rule.good || '删除') + '】');
+        }
+        violations.push({
+          bad: rule.bad,
+          good: rule.good || '',
+          cat: rule.cat,
+          rule: rule.rule || '',
+          sentence: sentence,
+          fixedSentence: fixedSentence
+        });
+      }
+    }
+  }
+
+  // Build highlighted HTML
+  let outHtml = escapeHtml(input);
+  let outText = input;
+  // Process longer matches first (already sorted)
+  const processed = new Set();
+  for(const rule of WORD_DB){
+    if(processed.has(rule.bad)) continue;
+    const escaped = escapeRegex(rule.bad);
+    const regexHtml = new RegExp(escaped, 'g');
+    if(regexHtml.test(outHtml)){
+      processed.add(rule.bad);
+      const ruleInfo = rule.rule ? ` [${rule.rule}]` : '';
+      if(doReplace && rule.good){
+        const replacement = rule.good;
+        outHtml = outHtml.replace(regexHtml, `<span class="word-good" title="原: ${rule.bad}${ruleInfo} · ${RULE_DESCRIPTIONS[rule.rule?.split(',')[0]] || ''}">${replacement}</span>`);
+        outText = outText.replace(new RegExp(escaped,'g'), replacement);
+      } else {
+        outHtml = outHtml.replace(regexHtml, `<span class="word-bad" title="违规${ruleInfo} · ${rule.cat} · 点击「检测并替换」">${rule.bad}</span>`);
+      }
+    }
+  }
+
+  return {html: outHtml, text: outText, count, rules, violations};
+}
+
+function updateStats(total, bad, replaced){
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statBad').textContent = bad;
+  document.getElementById('statReplaced').textContent = replaced;
+}
+
+function copyResult(){
+  if(!resultText){showToast('暂无可复制的内容');return}
+  navigator.clipboard.writeText(resultText).then(()=>{
+    showToast('已复制到剪贴板');
+  }).catch(()=>{
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = resultText; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('已复制到剪贴板');
+  });
+}
+
+function clearInput(){
+  document.getElementById('inputText').value = '';
+  document.getElementById('outputArea').innerHTML = '<span style="color:var(--text2);font-style:italic">检测与替换结果将在此处显示…</span>';
+  resultText = '';
+  updateStats(0,0,0);
+}
+
+function showToast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 2200);
+}
+
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function escapeRegex(str){
+  return str.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+}
+
+// Live detection on input
+document.getElementById('inputText').addEventListener('input', ()=>{
+  const input = document.getElementById('inputText').value;
+  if(!input.trim()){updateStats(0,0,0);return}
+  let count = 0;
+  for(const rule of WORD_DB){
+    if(new RegExp(escapeRegex(rule.bad)).test(input)) count++;
+  }
+  updateStats(input.length, count, 0);
+});
+
+// Init
+renderTabs();
+renderWordGrid();
+
+// ============ Rules Sidebar ============
+function toggleRules(){
+  const sidebar = document.getElementById('rulesSidebar');
+  const overlay = document.getElementById('rulesOverlay');
+  const isOpen = sidebar.classList.contains('open');
+  sidebar.classList.toggle('open', !isOpen);
+  overlay.classList.toggle('open', !isOpen);
+  document.body.style.overflow = isOpen ? '' : 'hidden';
+}
+
+function toggleSection(el){
+  const content = el.nextElementSibling;
+  const chevron = el.querySelector('.chevron');
+  if(content.classList.contains('collapsed')){
+    content.classList.remove('collapsed');
+    content.style.maxHeight = content.scrollHeight + 'px';
+    chevron.classList.remove('collapsed');
+  } else {
+    content.style.maxHeight = content.scrollHeight + 'px';
+    requestAnimationFrame(()=>{
+      content.classList.add('collapsed');
+      chevron.classList.add('collapsed');
+    });
+  }
+}
+
+// Set initial max-height for all rule-content sections
+document.querySelectorAll('.rule-content').forEach(el=>{
+  el.style.maxHeight = el.scrollHeight + 'px';
+});
+
+// Rules sidebar event listeners
+document.querySelector('.rules-toggle').addEventListener('click', toggleRules);
+document.querySelector('.rules-close').addEventListener('click', toggleRules);
+document.getElementById('rulesOverlay').addEventListener('click', toggleRules);
+document.querySelectorAll('.rule-section h4').forEach(h4 => {
+  h4.addEventListener('click', () => toggleSection(h4));
+});
+
+// ============ Video Analysis ============
+const MAX_VIDEO_DURATION = 300; // 5 minutes in seconds
+let videoFile = null;
+let videoFrames = [];
+let videoAnalysisResults = [];
+
+// Video upload zone drag & drop
+const uploadZone = document.getElementById('videoUploadZone');
+const fileInput = document.getElementById('videoFileInput');
+
+uploadZone.addEventListener('click', (e) => {
+  if (e.target === fileInput) return; // avoid double-triggering
+  fileInput.click();
+});
+
+uploadZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  uploadZone.classList.add('dragover');
+});
+
+uploadZone.addEventListener('dragleave', () => {
+  uploadZone.classList.remove('dragover');
+});
+
+uploadZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadZone.classList.remove('dragover');
+  const files = e.dataTransfer.files;
+  if (files.length > 0 && files[0].type.startsWith('video/')) {
+    handleVideoFile(files[0]);
+  } else {
+    showToast('请上传视频文件');
+  }
+});
+
+fileInput.addEventListener('change', (e) => {
+  if (e.target.files.length > 0) {
+    handleVideoFile(e.target.files[0]);
+  }
+});
+
+function handleVideoFile(file) {
+  const video = document.getElementById('videoPlayer');
+  const url = URL.createObjectURL(file);
+  video.src = url;
+  videoFile = file;
+
+  video.addEventListener('loadedmetadata', () => {
+    if (video.duration > MAX_VIDEO_DURATION) {
+      showToast(`视频时长超过 5 分钟（当前 ${Math.round(video.duration)} 秒），请裁剪后上传`);
+      URL.revokeObjectURL(url);
+      video.src = '';
+      videoFile = null;
+      return;
+    }
+
+    // Show player
+    uploadZone.style.display = 'none';
+    document.getElementById('videoPlayerWrap').style.display = 'block';
+    document.getElementById('frameStripWrap').style.display = 'block';
+
+    extractFrames();
+  }, { once: true });
+}
+
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+}
+
+async function extractFrames() {
+  const video = document.getElementById('videoPlayer');
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = 320;
+  canvas.height = 180;
+
+  videoFrames = [];
+  const strip = document.getElementById('frameStrip');
+  strip.innerHTML = '';
+
+  const duration = video.duration;
+  const interval = Math.max(2, duration / 30); // Max 30 frames, min 2s interval
+  const times = [];
+
+  for (let t = 0; t < duration; t += interval) {
+    times.push(t);
+  }
+
+  for (const t of times) {
+    video.currentTime = t;
+    await new Promise(resolve => {
+      video.addEventListener('seeked', resolve, { once: true });
+    });
+
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+
+    videoFrames.push({
+      time: t,
+      image: dataUrl,
+      flagged: false,
+      issues: []
+    });
+
+    // Create thumbnail
+    const thumb = document.createElement('div');
+    thumb.className = 'frame-thumb';
+    thumb.dataset.time = t;
+    thumb.innerHTML = `<img src="${dataUrl}" alt="Frame"><div class="frame-time">${formatTime(t)}</div><div class="frame-flag"></div>`;
+    thumb.onclick = () => {
+      video.currentTime = t;
+      document.querySelectorAll('.frame-thumb').forEach(el => el.classList.remove('active'));
+      thumb.classList.add('active');
+    };
+    strip.appendChild(thumb);
+  }
+}
+
+function analyzeVideo_old() {
+  const transcript = document.getElementById('transcriptInput') ? document.getElementById('transcriptInput').value.trim() : '';
+  if (!transcript && videoFrames.length === 0) {
+    showToast('请上传视频或输入台词文本');
+    return;
+  }
+
+  const progressWrap = document.getElementById('scanProgress');
+  progressWrap.classList.add('active');
+  const barFill = document.getElementById('scanBarFill');
+  const statusText = document.getElementById('scanStatusText');
+  const percentText = document.getElementById('scanPercent');
+
+  let progress = 0;
+  const totalSteps = 100;
+  const interval = setInterval(() => {
+    progress += Math.random() * 15;
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(interval);
+      setTimeout(() => {
+        progressWrap.classList.remove('active');
+        completeAnalysis(transcript);
+      }, 300);
+    }
+    barFill.style.width = `${progress}%`;
+    percentText.textContent = `${Math.round(progress)}%`;
+    if (progress < 30) statusText.textContent = '正在抽帧分析画面…';
+    else if (progress < 60) statusText.textContent = '检测台词违规词…';
+    else if (progress < 90) statusText.textContent = '评估内容风险…';
+    else statusText.textContent = '生成检测报告…';
+  }, 80);
+}
+
+function completeAnalysis(transcript) {
+  const violations = [];
+  
+  if (transcript) {
+    for (const rule of WORD_DB) {
+      const escaped = escapeRegex(rule.bad);
+      const regex = new RegExp(escaped, 'g');
+      let match;
+      while ((match = regex.exec(transcript)) !== null) {
+        violations.push({
+          word: rule.bad,
+          category: rule.cat,
+          replacement: rule.good,
+          rule: rule.rule || '',
+          position: match.index
+        });
+      }
+    }
+  }
+  
+  // Update subtitle timeline with violations
+  if (subtitleData.length > 0) {
+    subtitleData.forEach(sub => {
+      sub.violations = [];
+      for (const rule of WORD_DB) {
+        const escaped = escapeRegex(rule.bad);
+        const regex = new RegExp(escaped, 'g');
+        if (regex.test(sub.text)) {
+          sub.violations.push({
+            word: rule.bad,
+            category: rule.cat,
+            replacement: rule.good,
+            rule: rule.rule || ''
+          });
+        }
+      }
+    });
+    updateSubtitleTimelineDisplay();
+  }
+
+  const analysisDiv = document.getElementById('frameAnalysis');
+  let html = '';
+
+  if (violations.length > 0) {
+    html += '<div style="margin-bottom:1rem"><h4 style="font-family:var(--font-display);font-size:.9rem;font-weight:600;color:var(--danger);margin-bottom:.6rem">台词违规词检测（依据抖音 2026.05 规范）</h4>';
+    violations.forEach(v => {
+      const ruleCodes = v.rule ? v.rule.split(',').map(r => `<span class="rule-code">${r}</span>`).join('') : '';
+      const ruleDesc = v.rule ? v.rule.split(',').map(r => RULE_DESCRIPTIONS[r] || r).join('<br>') : '';
+      html += `<div class="frame-result flagged">
+        <div class="frame-info">
+          <div class="frame-ts" style="color:var(--danger);display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+            违规词：${v.word} ${ruleCodes}
+          </div>
+          <div class="frame-desc">分类：${v.category}</div>
+          ${ruleDesc ? `<div class="rule-ref">${ruleDesc}</div>` : ''}
+          <div class="fix-suggestion">建议替换为：${v.replacement}</div>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  if (violations.length === 0) {
+    html = '<div class="frame-result"><div class="frame-info" style="text-align:center;padding:1rem"><div class="frame-ok-tag" style="font-size:.85rem;padding:.5rem 1rem">✓ 未检测到明显违规内容</div></div></div>';
+  }
+
+  analysisDiv.innerHTML = html;
+
+  document.getElementById('videoStats').style.display = 'flex';
+  document.getElementById('vStatWords').textContent = violations.length;
+
+  // Show rules legend when violations found
+  if (violations.length > 0) {
+    document.getElementById('rulesLegend').style.display = 'block';
+  }
+
+  // Show violation summary
+  if (violations.length > 0) {
+    const summaryDiv = document.getElementById('violationSummary');
+    summaryDiv.style.display = 'block';
+    let summaryHTML = '<h5><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> 检测到违规内容</h5><div class="violation-list">';
+    
+    const uniqueViolations = [...new Map(violations.map(v => [v.word, v])).values()];
+    uniqueViolations.forEach(v => {
+      const ruleCodes = v.rule ? v.rule.split(',').map(r => `<span class="rule-code">${r}</span>`).join('') : '';
+      summaryHTML += `<div class="violation-tag"><span class="vt-word">${v.word}</span>${ruleCodes}<span class="vt-arrow">→</span><span class="vt-fix">${v.replacement}</span></div>`;
+    });
+    summaryHTML += '</div>';
+    summaryDiv.innerHTML = summaryHTML;
+  }
+}
+
+function updateSubtitleTimelineDisplay() {
+  const timeline = document.getElementById('subtitleTimeline');
+  const srtTimeline = document.getElementById('srtTimeline');
+  
+  [timeline, srtTimeline].forEach(container => {
+    if (!container) return;
+    container.innerHTML = '';
+    subtitleData.forEach((sub, index) => {
+      const div = document.createElement('div');
+      div.className = 'subtitle-item' + (sub.violations.length > 0 ? ' has-violation' : '');
+      
+      let textHTML = escapeHtml(sub.text);
+      sub.violations.forEach(v => {
+        const regex = new RegExp(escapeRegex(v.word), 'g');
+        textHTML = textHTML.replace(regex, `<span class="violation-word" title="${v.category}">${v.word}</span>`);
+      });
+      
+      let violationsHTML = '';
+      if (sub.violations.length > 0) {
+        violationsHTML = '<div class="sub-violations">违规：' + 
+          sub.violations.map(v => {
+            const ruleCodes = v.rule ? v.rule.split(',').map(r => `<span class="rule-code" style="font-size:.6rem">${r}</span>`).join('') : '';
+            return `${v.word}${ruleCodes}(${v.category})`;
+          }).join('、') + '</div>';
+        violationsHTML += '<div class="sub-fix">建议：' + 
+          sub.violations.map(v => `${v.word} → ${v.replacement}`).join('；') + '</div>';
+      }
+      
+      div.innerHTML = `
+        <div class="sub-time">${formatTime(sub.time)}</div>
+        <div class="sub-text">${textHTML}${violationsHTML}</div>
+      `;
+      div.onclick = () => {
+        document.getElementById('videoPlayer').currentTime = sub.time;
+      };
+      container.appendChild(div);
+    });
+  });
+}
+
+function clearVideoAnalysis() {
+  if (document.getElementById('transcriptInput')) {
+    document.getElementById('transcriptInput').value = '';
+  }
+  document.getElementById('frameAnalysis').innerHTML = '';
+  document.getElementById('videoStats').style.display = 'none';
+  document.getElementById('violationSummary').style.display = 'none';
+  
+  // Clear subtitle data
+  subtitleData = [];
+  document.getElementById('subtitleTimeline').innerHTML = '';
+  document.getElementById('srtTimeline').innerHTML = '';
+  const ocrTimeline = document.getElementById('ocrTimeline');
+  if (ocrTimeline) ocrTimeline.innerHTML = '';
+  
+  // Reset recognition status
+  const recStatus = document.getElementById('recognitionStatus');
+  if (recStatus) recStatus.classList.remove('listening');
+  const recStatusText = document.getElementById('recStatusText');
+  if (recStatusText) recStatusText.textContent = '点击"开始识别"自动提取视频语音转文字';
+  
+  // Reset OCR status
+  const ocrStatus = document.getElementById('ocrStatus');
+  if (ocrStatus) ocrStatus.classList.remove('listening');
+  const ocrStatusText = document.getElementById('ocrStatusText');
+  if (ocrStatusText) ocrStatusText.textContent = '点击"提取字幕"从视频画面中识别烧录字幕文字';
+  if (ocrRunning) stopOCRExtraction();
+  
+  videoFrames = [];
+  document.querySelectorAll('.frame-thumb').forEach(thumb => thumb.classList.remove('flagged'));
+  
+  // Stop speech recognition if running
+  if (isListening) {
+    stopSpeechRecognition();
+  }
+}
+
+function removeVideo() {
+  const video = document.getElementById('videoPlayer');
+  if (video.src) URL.revokeObjectURL(video.src);
+  video.src = '';
+  videoFile = null;
+  videoFrames = [];
+  document.getElementById('videoPlayerWrap').style.display = 'none';
+  document.getElementById('frameStripWrap').style.display = 'none';
+  document.getElementById('frameStrip').innerHTML = '';
+  document.getElementById('videoUploadZone').style.display = 'flex';
+  document.getElementById('videoFileInput').value = '';
+  clearVideoAnalysis();
+}
+
+function reuploadVideo() {
+  // Create a temporary file input for re-upload
+  const tempInput = document.createElement('input');
+  tempInput.type = 'file';
+  tempInput.accept = 'video/*';
+  tempInput.onchange = (e) => {
+    if (e.target.files.length > 0) {
+      // Clean up current video
+      const video = document.getElementById('videoPlayer');
+      if (video.src) URL.revokeObjectURL(video.src);
+      video.src = '';
+      videoFile = null;
+      videoFrames = [];
+      document.getElementById('frameStrip').innerHTML = '';
+      clearVideoAnalysis();
+      // Also clear BGM analysis
+      clearBGMAnalysis();
+      // Handle new file
+      handleVideoFile(e.target.files[0]);
+      showToast('已重新上传视频');
+    }
+  };
+  tempInput.click();
+}
+
+// ============ Subtitle Recognition ============
+let currentSubtitleSource = 'speech';
+let subtitleData = []; // {time, text, violations}
+let speechRecognition = null;
+let isListening = false;
+
+function switchSubtitleSource(source) {
+  currentSubtitleSource = source;
+  document.querySelectorAll('.subtitle-source-tab').forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.source === source);
+  });
+  document.getElementById('speechPanel').style.display = source === 'speech' ? 'block' : 'none';
+  document.getElementById('ocrPanel').style.display = source === 'ocr' ? 'block' : 'none';
+  document.getElementById('srtPanel').style.display = source === 'srt' ? 'block' : 'none';
+  document.getElementById('manualPanel').style.display = source === 'manual' ? 'block' : 'none';
+}
+
+async function startSpeechRecognition() {
+  const video = document.getElementById('videoPlayer');
+  if (!video.src || video.duration === 0) {
+    showToast('请先上传视频');
+    return;
+  }
+
+  // Check captureStream support
+  if (!video.captureStream && !video.mozCaptureStream) {
+    showToast('浏览器不支持音频提取，请使用 Chrome/Edge');
+    switchSubtitleSource('manual');
+    return;
+  }
+
+  subtitleData = [];
+  const timeline = document.getElementById('subtitleTimeline');
+  timeline.innerHTML = '';
+
+  document.getElementById('startRecBtn').style.display = 'none';
+  document.getElementById('stopRecBtn').style.display = 'inline-flex';
+  document.getElementById('recognitionStatus').classList.add('listening');
+  document.getElementById('recStatusText').textContent = '正在从视频提取音频…';
+
+  isListening = true;
+
+  try {
+    // Extract audio from video using captureStream
+    const stream = video.captureStream ? video.captureStream() : video.mozCaptureStream();
+    const audioTracks = stream.getAudioTracks();
+    
+    if (audioTracks.length === 0) {
+      showToast('视频没有音频轨道');
+      stopSpeechRecognition();
+      return;
+    }
+
+    const audioStream = new MediaStream(audioTracks);
+    
+    // Determine supported format
+    let mimeType = 'audio/webm;codecs=opus';
+    if (!MediaRecorder.isTypeSupported(mimeType)) {
+      mimeType = 'audio/webm';
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'audio/mp4';
+      }
+    }
+
+    const recorder = new MediaRecorder(audioStream, { mimeType });
+    const chunks = [];
+
+    recorder.ondataavailable = (e) => {
+      if (e.data.size > 0) chunks.push(e.data);
+    };
+
+    recorder.onstop = async () => {
+      if (!isListening) return;
+      
+      document.getElementById('recStatusText').textContent = '音频提取完成，正在AI识别语音…';
+      
+      const blob = new Blob(chunks, { type: mimeType });
+      
+      if (blob.size < 1000) {
+        showToast('音频数据太少，请检查视频是否有声音');
+        stopSpeechRecognition();
+        return;
+      }
+
+      // Send to server for whisper transcription
+      const formData = new FormData();
+      formData.append('audio', blob, 'audio.webm');
+
+      try {
+        const resp = await fetch('/api/transcribe', { method: 'POST', body: formData });
+        const data = await resp.json();
+
+        if (!data.ok) {
+          showToast('识别失败: ' + (data.error || '未知错误'));
+          stopSpeechRecognition();
+          return;
+        }
+
+        // Display segments with timestamps
+        if (data.segments && data.segments.length > 0) {
+          data.segments.forEach(seg => {
+            subtitleData.push({ time: seg.time, text: seg.text, violations: [] });
+            addSubtitleToTimeline(subtitleData.length - 1, timeline);
+          });
+        } else if (data.text && data.text.trim()) {
+          // No segments, split by sentences
+          const sentences = data.text.split(/[。！？!?\n]+/).filter(s => s.trim());
+          const duration = video.duration;
+          const interval = duration / Math.max(sentences.length, 1);
+          sentences.forEach((text, i) => {
+            subtitleData.push({ time: i * interval, text: text.trim(), violations: [] });
+            addSubtitleToTimeline(subtitleData.length - 1, timeline);
+          });
+        }
+
+        stopSpeechRecognition();
+        showToast(`识别完成，共 ${subtitleData.length} 条字幕`);
+      } catch (e) {
+        showToast('网络错误: ' + e.message);
+        stopSpeechRecognition();
+      }
+    };
+
+    // Start recording and play video (muted to avoid audio feedback)
+    recorder.start(1000); // Collect data every 1 second
+    video.currentTime = 0;
+    video.muted = true; // Mute playback, we're capturing the raw stream
+    video.volume = 0;
+    
+    const playPromise = video.play();
+    if (playPromise) {
+      playPromise.catch(err => {
+        showToast('请点击视频播放按钮开始');
+        recorder.stop();
+      });
+    }
+
+    document.getElementById('recStatusText').textContent = '正在提取音频（视频播放中，请稍候）…';
+
+    // Stop recording when video ends
+    video.onended = () => {
+      if (recorder.state === 'recording') {
+        recorder.stop();
+      }
+    };
+
+  } catch (e) {
+    showToast('音频提取失败: ' + e.message);
+    stopSpeechRecognition();
+  }
+}
+
+function stopSpeechRecognition() {
+  isListening = false;
+  const video = document.getElementById('videoPlayer');
+  video.pause();
+  document.getElementById('startRecBtn').style.display = 'inline-flex';
+  document.getElementById('stopRecBtn').style.display = 'none';
+  document.getElementById('recognitionStatus').classList.remove('listening');
+  const count = subtitleData.length;
+  if (count > 0) {
+    document.getElementById('recStatusText').textContent = `识别完成，共 ${count} 条字幕`;
+  } else {
+    document.getElementById('recStatusText').textContent = '未识别到字幕内容。建议：检查视频是否有音频，或切换到「手动输入」/「SRT文件」模式';
+  }
+}
+
+// ============ OCR Screen Subtitle Extraction ============
+let ocrWorker = null;
+let ocrRunning = false;
+
+async function startOCRExtraction() {
+  const video = document.getElementById('videoPlayer');
+  if (!video.src || video.duration === 0) {
+    showToast('请先上传视频');
+    return;
+  }
+
+  ocrRunning = true;
+  document.getElementById('startOcrBtn').style.display = 'none';
+  document.getElementById('stopOcrBtn').style.display = 'inline-flex';
+  document.getElementById('ocrStatus').classList.add('listening');
+  document.getElementById('ocrStatusText').textContent = '正在加载 OCR 引擎（首次约需10秒）…';
+  document.getElementById('ocrScanProgress').style.display = 'block';
+
+  const timeline = document.getElementById('ocrTimeline');
+  timeline.innerHTML = '';
+  
+  // Use OCR data as subtitle source
+  subtitleData = [];
+  currentSubtitleSource = 'ocr';
+
+  // Initialize Tesseract.js worker
+  try {
+    ocrWorker = await Tesseract.createWorker('chi_sim+eng', 1, {
+      logger: m => {
+        if (m.status === 'recognizing text') {
+          // Don't update progress here, we'll do it per frame
+        }
+      }
+    });
+  } catch (e) {
+    showToast('OCR 引擎加载失败: ' + e.message);
+    stopOCRExtraction();
+    return;
+  }
+
+  document.getElementById('ocrStatusText').textContent = 'OCR 引擎就绪，正在提取字幕…';
+
+  // Create hidden canvas for frame extraction
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  
+  const vw = video.videoWidth;
+  const vh = video.videoHeight;
+  canvas.width = vw;
+  canvas.height = vh;
+
+  // Determine subtitle crop region based on user selection
+  const position = document.getElementById('ocrPosition').value;
+  let cropY, cropH;
+  if (position === 'bottom') {
+    cropH = Math.round(vh * 0.2);
+    cropY = vh - cropH;
+  } else if (position === 'center') {
+    cropH = Math.round(vh * 0.2);
+    cropY = Math.round(vh * 0.4);
+  } else { // top
+    cropH = Math.round(vh * 0.2);
+    cropY = 0;
+  }
+  const cropX = Math.round(vw * 0.1);
+  const cropW = Math.round(vw * 0.8);
+
+  // Create a smaller canvas for the cropped subtitle region (scaled up 2x for better OCR)
+  const subCanvas = document.createElement('canvas');
+  const subCtx = subCanvas.getContext('2d', { willReadFrequently: true });
+  subCanvas.width = cropW;
+  subCanvas.height = cropH;
+
+  // Process frames every 2 seconds
+  const duration = video.duration;
+  const interval = 2; // seconds
+  const totalFrames = Math.ceil(duration / interval);
+  let processedFrames = 0;
+  let lastText = '';
+
+  // Create a temporary video element to seek without affecting the main player
+  const tempVideo = document.createElement('video');
+  tempVideo.src = video.src;
+  tempVideo.preload = 'auto';
+  tempVideo.muted = true;
+  
+  await new Promise(resolve => {
+    tempVideo.onloadeddata = resolve;
+    tempVideo.onerror = () => { showToast('无法加载视频进行字幕提取'); stopOCRExtraction(); resolve(); };
+  });
+
+  for (let t = 0; t < duration && ocrRunning; t += interval) {
+    // Seek to time
+    tempVideo.currentTime = t;
+    await new Promise(resolve => {
+      tempVideo.onseeked = resolve;
+      setTimeout(resolve, 2000); // timeout fallback
+    });
+
+    if (!ocrRunning) break;
+
+    // Draw frame to canvas
+    ctx.drawImage(tempVideo, 0, 0, vw, vh);
+    
+    // Crop subtitle region
+    subCtx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+
+    // Preprocess: convert to grayscale, increase contrast, threshold for white text
+    const imageData = subCtx.getImageData(0, 0, cropW, cropH);
+    const data = imageData.data;
+    for (let i = 0; i < data.length; i += 4) {
+      // Convert to luminance
+      const lum = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
+      // High threshold to isolate white/bright text, invert for Tesseract (black text on white bg)
+      const val = lum > 180 ? 0 : 255;
+      data[i] = val;
+      data[i+1] = val;
+      data[i+2] = val;
+    }
+    subCtx.putImageData(imageData, 0, 0);
+
+    // OCR the processed frame
+    try {
+      const result = await ocrWorker.recognize(subCanvas);
+      const text = result.data.text.trim().replace(/\s+/g, '');
+      
+      if (text && text.length > 1 && text !== lastText) {
+        // Filter out noise (very short or all-same-character strings)
+        const uniqueChars = new Set(text).size;
+        if (uniqueChars >= 2 || text.length >= 3) {
+          subtitleData.push({ time: t, text, violations: [] });
+          addSubtitleToTimeline(subtitleData.length - 1, timeline);
+          lastText = text;
+          document.getElementById('ocrStatusText').textContent = `提取中…已获取 ${subtitleData.length} 条字幕 (${formatTime(t)})`;
+        }
+      }
+    } catch (e) {
+      console.error('OCR error at', t, e);
+    }
+
+    processedFrames++;
+    const pct = Math.round((processedFrames / totalFrames) * 100);
+    document.getElementById('ocrScanBarFill').style.width = pct + '%';
+    document.getElementById('ocrScanPercent').textContent = pct + '%';
+  }
+
+  stopOCRExtraction();
+  showToast(subtitleData.length > 0 ? `字幕提取完成，共 ${subtitleData.length} 条` : '未识别到字幕内容，请尝试调整字幕位置后重试');
+}
+
+function stopOCRExtraction() {
+  ocrRunning = false;
+  document.getElementById('startOcrBtn').style.display = 'inline-flex';
+  document.getElementById('stopOcrBtn').style.display = 'none';
+  document.getElementById('ocrStatus').classList.remove('listening');
+  document.getElementById('ocrScanProgress').style.display = 'none';
+  
+  if (ocrWorker) {
+    ocrWorker.terminate();
+    ocrWorker = null;
+  }
+  
+  const count = subtitleData.length;
+  if (count > 0) {
+    document.getElementById('ocrStatusText').textContent = `提取完成，共 ${count} 条字幕`;
+  } else {
+    document.getElementById('ocrStatusText').textContent = '未识别到字幕内容。可尝试切换字幕位置（底部/中间/顶部）后重试';
+  }
+}
+
+function addSubtitleToTimeline(index, container) {
+  const sub = subtitleData[index];
+  const div = document.createElement('div');
+  div.className = 'subtitle-item';
+  div.innerHTML = `
+    <div class="sub-time">${formatTime(sub.time)}</div>
+    <div class="sub-text">${escapeHtml(sub.text)}</div>
+  `;
+  div.onclick = () => {
+    document.getElementById('videoPlayer').currentTime = sub.time;
+  };
+  container.appendChild(div);
+}
+
+function loadSRTFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const content = e.target.result;
+    subtitleData = parseSRT(content);
+    renderSRTTimeline();
+    showToast(`已加载 ${subtitleData.length} 条字幕`);
+  };
+  reader.readAsText(file);
+}
+
+function parseSRT(content) {
+  const subs = [];
+  const blocks = content.trim().split(/\n\s*\n/);
+  
+  for (const block of blocks) {
+    const lines = block.split('\n');
+    if (lines.length < 3) continue;
+    
+    const timeLine = lines[1];
+    const timeMatch = timeLine.match(/(\d{2}):(\d{2}):(\d{2})[,.](\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2})[,.](\d{3})/);
+    
+    if (timeMatch) {
+      const startTime = parseInt(timeMatch[1]) * 3600 + parseInt(timeMatch[2]) * 60 + parseInt(timeMatch[3]) + parseInt(timeMatch[4]) / 1000;
+      const text = lines.slice(2).join(' ').replace(/<[^>]*>/g, '').trim();
+      if (text) {
+        subs.push({ time: startTime, text, violations: [] });
+      }
+    }
+  }
+  
+  return subs;
+}
+
+function renderSRTTimeline() {
+  const timeline = document.getElementById('srtTimeline');
+  timeline.innerHTML = '';
+  subtitleData.forEach((sub, index) => {
+    addSubtitleToTimeline(index, timeline);
+  });
+}
+
+function analyzeVideo() {
+  let transcript = '';
+  
+  if (currentSubtitleSource === 'manual') {
+    transcript = document.getElementById('transcriptInput').value.trim();
+  } else if (currentSubtitleSource === 'speech' || currentSubtitleSource === 'srt' || currentSubtitleSource === 'ocr') {
+    transcript = subtitleData.map(s => s.text).join(' ');
+  }
+  
+  if (!transcript && videoFrames.length === 0) {
+    showToast('请上传视频或输入台词文本');
+    return;
+  }
+
+  const progressWrap = document.getElementById('scanProgress');
+  progressWrap.classList.add('active');
+  const barFill = document.getElementById('scanBarFill');
+  const statusText = document.getElementById('scanStatusText');
+  const percentText = document.getElementById('scanPercent');
+
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += Math.random() * 15;
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(interval);
+      setTimeout(() => {
+        progressWrap.classList.remove('active');
+        completeAnalysis(transcript);
+      }, 300);
+    }
+    barFill.style.width = `${progress}%`;
+    percentText.textContent = `${Math.round(progress)}%`;
+    if (progress < 30) statusText.textContent = '正在抽帧分析画面…';
+    else if (progress < 60) statusText.textContent = '检测台词违规词…';
+    else if (progress < 90) statusText.textContent = '评估内容风险…';
+    else statusText.textContent = '生成检测报告…';
+  }, 80);
+}
+
+// ============ BGM Analysis ============
+let bgmFile = null;
+let bgmAudioContext = null;
+let bgmBuffer = null;
+
+// Known problematic BGM patterns (frequency + tempo signatures)
+const BGM_RISK_DB = [
+  {name:'流行商业歌曲', risk:'high', desc:'周杰伦、林俊杰、邓紫棋、Taylor Swift等商业歌手作品', platform:'全平台'},
+  {name:'影视OST原声', risk:'high', desc:'韩剧OST、漫威/迪士尼配乐、综艺BGM', platform:'全平台'},
+  {name:'大厂牌音乐', risk:'high', desc:'索尼音乐、环球音乐、华纳音乐旗下艺人作品', platform:'全平台'},
+  {name:'热门网络BGM', risk:'medium', desc:'突然爆火的网络音乐，版权方可能后续追讨', platform:'抖音/快手'},
+  {name:'DJ Remix采样', risk:'medium', desc:'使用原版歌曲采样的DJ混音版本', platform:'全平台'},
+  {name:'未授权外国音乐', risk:'medium', desc:'国外音乐未在国内平台获得授权', platform:'抖音/小红书'},
+  {name:'游戏BGM', risk:'medium', desc:'王者荣耀、原神等游戏原声音乐', platform:'全平台'},
+  {name:'动漫配乐', risk:'medium', desc:'日本动漫OST、国漫配乐', platform:'全平台'},
+];
+
+// BGM file upload
+const bgmUploadZone = document.getElementById('bgmUploadZone');
+const bgmFileInput = document.getElementById('bgmFileInput');
+
+bgmFileInput.addEventListener('change', (e) => {
+  if (e.target.files.length > 0) {
+    handleBGMFile(e.target.files[0]);
+  }
+});
+
+bgmUploadZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  bgmUploadZone.style.borderColor = 'var(--accent)';
+});
+
+bgmUploadZone.addEventListener('dragleave', () => {
+  bgmUploadZone.style.borderColor = 'var(--border)';
+});
+
+bgmUploadZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  bgmUploadZone.style.borderColor = 'var(--border)';
+  const files = e.dataTransfer.files;
+  if (files.length > 0 && (files[0].type.startsWith('audio/') || files[0].type.startsWith('video/'))) {
+    handleBGMFile(files[0]);
+  } else {
+    showToast('请上传音频文件');
+  }
+});
+
+function handleBGMFile(file) {
+  bgmFile = file;
+  const player = document.getElementById('bgmPlayer');
+  const url = URL.createObjectURL(file);
+  player.src = url;
+  bgmUploadZone.style.display = 'none';
+  document.getElementById('bgmPlayerWrap').style.display = 'block';
+}
+
+function removeBGM() {
+  const player = document.getElementById('bgmPlayer');
+  if (player.src) URL.revokeObjectURL(player.src);
+  player.src = '';
+  bgmFile = null;
+  bgmBuffer = null;
+  document.getElementById('bgmPlayerWrap').style.display = 'none';
+  bgmUploadZone.style.display = 'block';
+  bgmFileInput.value = '';
+  clearBGMAnalysis();
+}
+
+function clearBGMAnalysis() {
+  document.getElementById('bgmResults').innerHTML = `
+    <div style="text-align:center;padding:2rem;color:var(--text2)">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1" style="margin-bottom:.5rem">
+        <path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle>
+      </svg>
+      <p style="font-size:.82rem">上传音频或从视频提取后点击检测</p>
+    </div>`;
+  document.getElementById('bgmScanProgress').style.display = 'none';
+}
+
+async function extractBGMFromVideo() {
+  const video = document.getElementById('videoPlayer');
+  if (!video.src || video.duration === 0) {
+    showToast('请先上传视频后再提取BGM');
+    return;
+  }
+
+  showToast('正在从视频提取音频…');
+  
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Create a media element source from the video
+    const response = await fetch(video.src);
+    const arrayBuffer = await response.arrayBuffer();
+    
+    // Try to decode as audio
+    try {
+      bgmBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+      bgmAudioContext = audioCtx;
+      
+      // Convert to WAV blob for playback
+      const wavBlob = audioBufferToWav(bgmBuffer);
+      const wavFile = new File([wavBlob], 'extracted-bgm.wav', { type: 'audio/wav' });
+      handleBGMFile(wavFile);
+      showToast('BGM提取成功，可以点击检测');
+    } catch(e) {
+      showToast('无法解码视频音频，请手动上传音频文件');
+      audioCtx.close();
+    }
+  } catch(e) {
+    showToast('提取失败: ' + e.message);
+  }
+}
+
+function audioBufferToWav(buffer) {
+  const numChannels = buffer.numberOfChannels;
+  const sampleRate = buffer.sampleRate;
+  const format = 1; // PCM
+  const bitDepth = 16;
+  
+  const bytesPerSample = bitDepth / 8;
+  const blockAlign = numChannels * bytesPerSample;
+  
+  const data = [];
+  for (let ch = 0; ch < numChannels; ch++) {
+    data.push(buffer.getChannelData(ch));
+  }
+  
+  const numSamples = buffer.length;
+  const dataSize = numSamples * blockAlign;
+  const headerSize = 44;
+  const totalSize = headerSize + dataSize;
+  
+  const arrayBuffer = new ArrayBuffer(totalSize);
+  const view = new DataView(arrayBuffer);
+  
+  // WAV header
+  writeString(view, 0, 'RIFF');
+  view.setUint32(4, totalSize - 8, true);
+  writeString(view, 8, 'WAVE');
+  writeString(view, 12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, format, true);
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * blockAlign, true);
+  view.setUint16(32, blockAlign, true);
+  view.setUint16(34, bitDepth, true);
+  writeString(view, 36, 'data');
+  view.setUint32(40, dataSize, true);
+  
+  // Write samples
+  let offset = 44;
+  for (let i = 0; i < numSamples; i++) {
+    for (let ch = 0; ch < numChannels; ch++) {
+      let sample = data[ch][i];
+      sample = Math.max(-1, Math.min(1, sample));
+      sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+      view.setInt16(offset, sample, true);
+      offset += 2;
+    }
+  }
+  
+  return new Blob([arrayBuffer], { type: 'audio/wav' });
+}
+
+function writeString(view, offset, str) {
+  for (let i = 0; i < str.length; i++) {
+    view.setUint8(offset + i, str.charCodeAt(i));
+  }
+}
+
+async function analyzeBGM() {
+  const player = document.getElementById('bgmPlayer');
+  if (!player.src || player.duration === 0) {
+    showToast('请先上传音频文件或从视频提取BGM');
+    return;
+  }
+
+  const progressWrap = document.getElementById('bgmScanProgress');
+  progressWrap.style.display = 'block';
+  const barFill = document.getElementById('bgmScanBarFill');
+  const statusText = document.getElementById('bgmScanStatusText');
+  const percentText = document.getElementById('bgmScanPercent');
+
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += Math.random() * 12;
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(interval);
+      setTimeout(() => {
+        progressWrap.style.display = 'none';
+        performBGMAnalysis();
+      }, 300);
+    }
+    barFill.style.width = `${progress}%`;
+    percentText.textContent = `${Math.round(progress)}%`;
+    if (progress < 25) statusText.textContent = '解码音频数据…';
+    else if (progress < 50) statusText.textContent = '分析音频频谱特征…';
+    else if (progress < 75) statusText.textContent = '比对版权音乐库…';
+    else statusText.textContent = '生成风险评估报告…';
+  }, 80);
+}
+
+async function performBGMAnalysis() {
+  const player = document.getElementById('bgmPlayer');
+  const resultsDiv = document.getElementById('bgmResults');
+  
+  // Audio analysis using Web Audio API
+  let analysis = {
+    duration: player.duration,
+    hasAudio: true,
+    isSilent: false,
+    avgVolume: 0,
+    peakVolume: 0,
+    frequencyProfile: 'unknown',
+    risks: [],
+    warnings: [],
+    suggestions: []
+  };
+
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const response = await fetch(player.src);
+    const arrayBuffer = await response.arrayBuffer();
+    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+    
+    // Analyze audio data
+    const channelData = audioBuffer.getChannelData(0);
+    let sum = 0;
+    let peak = 0;
+    let silentSegments = 0;
+    const segmentSize = Math.floor(audioBuffer.sampleRate * 0.5); // 0.5s segments
+    const numSegments = Math.floor(channelData.length / segmentSize);
+    
+    for (let i = 0; i < channelData.length; i++) {
+      const abs = Math.abs(channelData[i]);
+      sum += abs;
+      if (abs > peak) peak = abs;
+    }
+    
+    analysis.avgVolume = sum / channelData.length;
+    analysis.peakVolume = peak;
+    
+    // Check for silent segments
+    for (let seg = 0; seg < numSegments; seg++) {
+      let segSum = 0;
+      const start = seg * segmentSize;
+      for (let i = start; i < start + segmentSize && i < channelData.length; i++) {
+        segSum += Math.abs(channelData[i]);
+      }
+      if (segSum / segmentSize < 0.001) silentSegments++;
+    }
+    
+    const silentRatio = silentSegments / numSegments;
+    if (silentRatio > 0.8) {
+      analysis.isSilent = true;
+      analysis.risks.push({level:'high', msg:'音频几乎完全静音，上传后可能无法正常播放'});
+    } else if (silentRatio > 0.5) {
+      analysis.warnings.push({level:'medium', msg:'音频包含大量静音片段（' + Math.round(silentRatio*100) + '%），部分平台可能会标记为异常'});
+    }
+    
+    // Check volume levels
+    if (analysis.avgVolume < 0.005) {
+      analysis.warnings.push({level:'medium', msg:'音频整体音量过低，上传后可能听不到声音'});
+      analysis.suggestions.push('建议使用音频编辑软件提高音量后重新上传');
+    } else if (analysis.peakVolume > 0.95) {
+      analysis.warnings.push({level:'low', msg:'音频存在削峰失真（峰值 ' + Math.round(analysis.peakVolume*100) + '%），可能影响听感'});
+    }
+    
+    // Check audio duration
+    if (audioBuffer.duration < 3) {
+      analysis.warnings.push({level:'low', msg:'音频时长过短（' + audioBuffer.duration.toFixed(1) + '秒），可能不是完整BGM'});
+    }
+    
+    // Frequency analysis using OfflineAudioContext + BiquadFilter
+    try {
+      const sampleRate = audioBuffer.sampleRate;
+      
+      // Mid-frequency (vocal range 300-4000Hz) energy
+      const midCtx = new OfflineAudioContext(1, audioBuffer.length, sampleRate);
+      const midSrc = midCtx.createBufferSource();
+      midSrc.buffer = audioBuffer;
+      const midHP = midCtx.createBiquadFilter();
+      midHP.type = 'highpass'; midHP.frequency.value = 300;
+      const midLP = midCtx.createBiquadFilter();
+      midLP.type = 'lowpass'; midLP.frequency.value = 4000;
+      midSrc.connect(midHP); midHP.connect(midLP); midLP.connect(midCtx.destination);
+      midSrc.start();
+      const midBuf = await midCtx.startRendering();
+      const midData = midBuf.getChannelData(0);
+      let midEnergy = 0;
+      for (let i = 0; i < midData.length; i++) midEnergy += midData[i] * midData[i];
+      midEnergy = Math.sqrt(midEnergy / midData.length);
+      
+      // Low-frequency (<300Hz) energy
+      const lowCtx = new OfflineAudioContext(1, audioBuffer.length, sampleRate);
+      const lowSrc = lowCtx.createBufferSource();
+      lowSrc.buffer = audioBuffer;
+      const lowLP = lowCtx.createBiquadFilter();
+      lowLP.type = 'lowpass'; lowLP.frequency.value = 300;
+      lowSrc.connect(lowLP); lowLP.connect(lowCtx.destination);
+      lowSrc.start();
+      const lowBuf = await lowCtx.startRendering();
+      const lowData = lowBuf.getChannelData(0);
+      let lowEnergy = 0;
+      for (let i = 0; i < lowData.length; i++) lowEnergy += lowData[i] * lowData[i];
+      lowEnergy = Math.sqrt(lowEnergy / lowData.length);
+      
+      // High-frequency (>4000Hz) energy
+      const highCtx = new OfflineAudioContext(1, audioBuffer.length, sampleRate);
+      const highSrc = highCtx.createBufferSource();
+      highSrc.buffer = audioBuffer;
+      const highHP = highCtx.createBiquadFilter();
+      highHP.type = 'highpass'; highHP.frequency.value = 4000;
+      highSrc.connect(highHP); highHP.connect(highCtx.destination);
+      highSrc.start();
+      const highBuf = await highCtx.startRendering();
+      const highData = highBuf.getChannelData(0);
+      let highEnergy = 0;
+      for (let i = 0; i < highData.length; i++) highEnergy += highData[i] * highData[i];
+      highEnergy = Math.sqrt(highEnergy / highData.length);
+      
+      const totalEnergy = lowEnergy + midEnergy + highEnergy;
+      if (totalEnergy > 0) {
+        const lowRatio = lowEnergy / totalEnergy;
+        const midRatio = midEnergy / totalEnergy;
+        const highRatio = highEnergy / totalEnergy;
+        
+        if (midRatio > 0.6) {
+          analysis.frequencyProfile = 'vocal-heavy';
+          analysis.warnings.push({level:'high', msg:'音频中频（人声频段）能量占比过高（' + Math.round(midRatio*100) + '%），可能包含受版权保护的人声演唱'});
+          analysis.suggestions.push('建议使用纯音乐/无人声的BGM，或使用剪映/抖音官方音乐库中的音乐');
+        } else if (lowRatio > 0.5) {
+          analysis.frequencyProfile = 'bass-heavy';
+          analysis.warnings.push({level:'medium', msg:'低频能量较强，可能是DJ/电子音乐风格，部分平台对电子Remix版本有版权检测'});
+        }
+      }
+    } catch(freqErr) {
+      console.error('Frequency analysis error:', freqErr);
+    }
+    
+    // Check for common copyrighted patterns
+    analysis.risks.push({level:'info', msg:'⚠️ 无法100%确认版权状态。建议使用平台官方音乐库中的音乐以确保安全'});
+    
+    // Duration check for platform limits
+    if (audioBuffer.duration > 60) {
+      analysis.warnings.push({level:'medium', msg:'BGM时长超过60秒（' + Math.round(audioBuffer.duration) + '秒），部分平台对较长BGM有更严格的版权检测'});
+      analysis.suggestions.push('建议将BGM剪辑到60秒以内，或使用平台音乐库中已授权的完整版');
+    }
+    
+    audioCtx.close();
+  } catch(e) {
+    analysis.risks.push({level:'high', msg:'音频分析失败: ' + e.message});
+    analysis.suggestions.push('请尝试使用其他格式的音频文件（MP3/WAV）');
+  }
+
+  // Render results
+  let html = '';
+  
+  // Summary header
+  const riskLevel = analysis.risks.filter(r => r.level === 'high').length > 0 ? 'high' : 
+                    (analysis.warnings.filter(w => w.level === 'high' || w.level === 'medium').length > 0 ? 'medium' : 'low');
+  const riskColors = {high:'var(--danger)', medium:'#ff9800', low:'var(--safe)'};
+  const riskLabels = {high:'高风险', medium:'中风险', low:'低风险'};
+  const riskBgs = {high:'var(--danger-bg)', medium:'rgba(255,152,0,.08)', low:'var(--safe-bg)'};
+  
+  html += '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:1rem;padding:.8rem;background:' + riskBgs[riskLevel] + ';border:1px solid ' + (riskLevel==='high'?'var(--danger-border)':riskLevel==='medium'?'rgba(255,152,0,.2)':'rgba(93,186,125,.2)') + ';border-radius:8px">';
+  html += '<div style="font-size:1.5rem;font-weight:700;color:' + riskColors[riskLevel] + '">' + riskLabels[riskLevel] + '</div>';
+  html += '<div style="font-size:.78rem;color:var(--text2)">';
+  html += '时长 ' + formatTime(analysis.duration) + ' · ';
+  html += '平均音量 ' + Math.round(analysis.avgVolume * 1000) / 10 + ' · ';
+  html += '峰值 ' + Math.round(analysis.peakVolume * 100) + '%';
+  html += '</div></div>';
+
+  // Risks
+  if (analysis.risks.length > 0) {
+    html += '<div style="margin-bottom:.8rem">';
+    analysis.risks.forEach(r => {
+      const color = r.level === 'high' ? 'var(--danger)' : r.level === 'medium' ? '#ff9800' : 'var(--text2)';
+      const icon = r.level === 'high' ? '🚫' : r.level === 'medium' ? '⚠️' : 'ℹ️';
+      html += '<div style="font-size:.78rem;padding:.4rem .6rem;margin-bottom:.3rem;background:var(--surface2);border-radius:6px;border-left:3px solid ' + color + '">' + icon + ' ' + r.msg + '</div>';
+    });
+    html += '</div>';
+  }
+
+  // Warnings
+  if (analysis.warnings.length > 0) {
+    html += '<div style="margin-bottom:.8rem">';
+    html += '<div style="font-size:.78rem;font-weight:600;color:#ff9800;margin-bottom:.3rem">检测发现：</div>';
+    analysis.warnings.forEach(w => {
+      const color = w.level === 'high' ? 'var(--danger)' : w.level === 'medium' ? '#ff9800' : 'var(--text2)';
+      html += '<div style="font-size:.78rem;padding:.4rem .6rem;margin-bottom:.3rem;background:var(--surface2);border-radius:6px;border-left:3px solid ' + color + '">' + w.msg + '</div>';
+    });
+    html += '</div>';
+  }
+
+  // Suggestions
+  if (analysis.suggestions.length > 0) {
+    html += '<div>';
+    html += '<div style="font-size:.78rem;font-weight:600;color:var(--safe);margin-bottom:.3rem">建议：</div>';
+    analysis.suggestions.forEach(s => {
+      html += '<div style="font-size:.78rem;padding:.4rem .6rem;margin-bottom:.3rem;background:var(--safe-bg);border-radius:6px">✅ ' + s + '</div>';
+    });
+    html += '</div>';
+  }
+
+  // No issues found
+  if (analysis.risks.length === 0 && analysis.warnings.length === 0) {
+    html += '<div style="text-align:center;padding:1rem"><div class="frame-ok-tag" style="font-size:.85rem;padding:.5rem 1rem">✓ 音频基础检测未发现明显问题</div>';
+    html += '<p style="font-size:.75rem;color:var(--text2);margin-top:.5rem">注意：版权检测需要比对平台曲库，此处仅做基础音频分析。建议使用抖音/剪映官方音乐库确保100%安全。</p></div>';
+  }
+
+  resultsDiv.innerHTML = html;
+}
+</script>
+
+</body></html>

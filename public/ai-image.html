@@ -1,0 +1,1935 @@
+<!DOCTYPE html>
+<html lang="zh-Hans"><head><script>var __mr='footer',__md='herng9d2.mule.page';document.addEventListener('DOMContentLoaded', function () {
+  var BAR_HEIGHT = 38;
+
+  // --- detect page theme ---
+  var isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  // fallback: sample body/html background color
+  if (!isDark) {
+    try {
+      var sample = getComputedStyle(document.body).backgroundColor;
+      if (sample === 'rgba(0, 0, 0, 0)' || sample === 'transparent') {
+        sample = getComputedStyle(document.documentElement).backgroundColor;
+      }
+      if (sample && sample !== 'rgba(0, 0, 0, 0)' && sample !== 'transparent') {
+        var m = sample.match(/\d+/g);
+        if (m) {
+          var brightness = (parseInt(m[0]) * 299 + parseInt(m[1]) * 587 + parseInt(m[2]) * 114) / 1000;
+          isDark = brightness < 128;
+        }
+      }
+    } catch (e) {}
+  }
+
+  // --- shared CSS (always injected into <head>) ---
+  var SHARED_CSS = '<style>' +
+    '@keyframes mulepage-svg-glow-dark{0%,100%{color:#ffffff}50%{color:#3b82f6}}' +
+    '@keyframes mulepage-svg-glow-light{0%,100%{color:#000000}50%{color:#3b82f6}}' +
+    '.mulepage-anim-dark{animation:mulepage-svg-glow-dark 2.5s ease-in-out infinite}' +
+    '.mulepage-anim-light{animation:mulepage-svg-glow-light 2.5s ease-in-out infinite}' +
+    '.mulepage-btn-dark{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:0;transition:all 0.2s ease}' +
+    '.mulepage-btn-dark:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15)}' +
+    '.mulepage-btn-light{background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.08);border-radius:0;transition:all 0.2s ease}' +
+    '.mulepage-btn-light:hover{background:rgba(0,0,0,0.08);border-color:rgba(0,0,0,0.15)}' +
+    '.mulepage-close-dark{color:rgba(255,255,255,0.3);transition:color 0.2s ease}' +
+    '.mulepage-close-dark:hover{color:#ffffff}' +
+    '.mulepage-close-light{color:rgba(0,0,0,0.3);transition:color 0.2s ease}' +
+    '.mulepage-close-light:hover{color:#000000}' +
+    '#mulepage-footer-link{transition:opacity 0.2s ease}' +
+    '#mulepage-footer-link:hover{opacity:0.7}' +
+    '.mulepage-float{transition:box-shadow 0.2s ease;will-change:box-shadow}' +
+    '.mulepage-float:hover{box-shadow:0 6px 20px rgba(0,0,0,0.12),0 2px 6px rgba(0,0,0,0.08)}' +
+    '.mulepage-float-close{display:inline-flex;align-items:center;justify-content:center;max-width:0;margin-left:0;overflow:hidden;opacity:0;transition:max-width 0.2s ease,margin-left 0.2s ease,opacity 0.15s ease;padding:0;border:none;background:none;cursor:pointer;font-size:16px;line-height:1;font-weight:300;height:16px;will-change:max-width,opacity}' +
+    '.mulepage-float:hover .mulepage-float-close{max-width:14px;margin-left:4px;opacity:1}' +
+    '</style>';
+
+  // always inject shared CSS into <head> so it survives banner removal
+  document.head.insertAdjacentHTML('beforeend', SHARED_CSS);
+
+  // --- SVG icon (shared, rx=0 for sharp corners) ---
+  var ICON16 = '<svg width="16" height="16" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+    '<rect width="36" height="36" rx="0" fill="#FBF9F6"/><g clip-path="url(#c_top)">' +
+    '<path d="M6.387 21.732v8.895H18.762V28.5h2.32v1.16h8.121V28.5h1.16v-7.928h-1.16v-1.16h-4.64v-1.16h-1.16v-1.16h-1.16v-1.16h-1.16v-1.16h-1.16v-1.16h3.287v-1.934h3.48V9.357H16.442v3.48h-2.128V6.07h-2.32v2.127H9.674v3.48H7.547v10.055H6.387Z" fill="#000"/>' +
+    '<path d="M13.154 21.732v-4.447h1.16v-1.16h4.448v4.447h-1.16v1.16h-4.448Z" fill="#fff"/>' +
+    '<rect x="15.281" y="18.252" width="2.32" height="2.32" fill="#000"/>' +
+    '<path d="M21.082 27.34v-5.608h1.16v-1.16h5.801v1.16h1.16v5.608h-1.16V28.5h-5.801v-1.16h-1.16Z" fill="#fff"/>' +
+    '<path d="M26.883 21.732h-2.32v1.16h1.16v1.16h1.16v-2.32Z" fill="#000"/>' +
+    '<path d="M22.242 24.053v2.32h1.16v1.16h3.48v-1.16h-2.32v-1.16h-1.16v-1.16h-1.16Z" fill="#000"/>' +
+    '</g><defs><clipPath id="c_top"><rect width="24.75" height="24.75" fill="#fff" transform="translate(6 6)"/></clipPath></defs></svg>';
+
+  var ICON16_FOOT = ICON16.replace(/c_top/g, 'c_foot');
+
+  // --- SVG brand text ---
+  var BRAND_SVG_DARK = '<svg class="mulepage-anim-dark" width="58" height="16" viewBox="0 0 58 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="user-select:none;">' +
+    '<text x="0" y="13" font-family="inherit" font-weight="600" font-size="13" fill="currentColor">MuleRun</text></svg>';
+
+  var BRAND_SVG_LIGHT = '<svg id="mulepage-footer-svg-text" class="mulepage-anim-light" width="56" height="15" viewBox="0 0 58 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="user-select:none;">' +
+    '<text x="0" y="13" font-family="inherit" font-weight="600" font-size="13" fill="currentColor">MuleRun</text></svg>';
+
+  // --- banner (adapts to page theme) ---
+  var bannerBg = isDark ? '#050505' : '#ffffff';
+  var bannerBorder = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+  var bannerColor = isDark ? '#fff' : '#000';
+  var bannerSubColor = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)';
+  var bannerTextColor = isDark ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.65)';
+  var bannerArrowColor = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)';
+  var bannerSepColor = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)';
+  var bannerBtnClass = isDark ? 'mulepage-btn-dark' : 'mulepage-btn-light';
+  var bannerCloseClass = isDark ? 'mulepage-close-dark' : 'mulepage-close-light';
+  var bannerBrandSvg = isDark ? BRAND_SVG_DARK : BRAND_SVG_LIGHT.replace('mulepage-footer-svg-text', 'mulepage-bar-svg-text');
+
+  var BANNER = '<div id="mulepage-bar" style="position:fixed;top:0;left:0;width:100%;height:' + BAR_HEIGHT + 'px;' +
+    'background:' + bannerBg + ';border-bottom:1px solid ' + bannerBorder + ';color:' + bannerColor + ';' +
+    'display:flex;align-items:center;justify-content:center;gap:10px;' +
+    'font-family:Inter,-apple-system,BlinkMacSystemFont,\'Segoe UI\',\'Helvetica Neue\',sans-serif;' +
+    'font-size:13px;z-index:2147483647;letter-spacing:0.02em;">' +
+    '<span style="color:' + bannerSubColor + ';font-size:12px;text-transform:uppercase;letter-spacing:0.05em;">Built with</span>' +
+    '<span id="mulepage-bar-link" class="' + bannerBtnClass + '" style="display:inline-flex;align-items:center;gap:6px;' +
+    'padding:3px 10px 3px 6px;cursor:pointer;">' +
+    ICON16 + bannerBrandSvg + '</span>' +
+    '<span style="color:' + bannerSepColor + ';margin:0 2px;">|</span>' +
+    '<span style="color:' + bannerTextColor + ';">Create your own website in minutes</span>' +
+    '<span style="color:' + bannerArrowColor + ';margin-left:-2px;">\u2192</span>' +
+    '<button id="mulepage-bar-close" class="' + bannerCloseClass + '" style="position:absolute;right:16px;background:none;border:none;border-radius:0;' +
+    'font-size:18px;cursor:pointer;line-height:1;padding:4px;font-weight:300;">\u00d7</button>' +
+    '</div>';
+
+  // --- floating widget (bottom-right, glassmorphism) ---
+  var floatBg = isDark ? 'rgba(30,30,30,0.65)' : 'rgba(255,255,255,0.65)';
+  var floatBorder = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)';
+  var floatShadow = isDark
+    ? '0 4px 16px rgba(0,0,0,0.4),0 1px 4px rgba(0,0,0,0.3)'
+    : '0 4px 16px rgba(0,0,0,0.08),0 1px 4px rgba(0,0,0,0.06)';
+  var floatBrandSvg = isDark ? BRAND_SVG_LIGHT.replace('mulepage-anim-light', 'mulepage-anim-dark') : BRAND_SVG_LIGHT;
+  var floatCloseColor = isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.3)';
+  var floatCloseHover = isDark ? '#ffffff' : '#000000';
+  var byColor = isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)';
+
+  var FOOTER = '<div id="mulepage-footer" class="mulepage-float" style="position:fixed !important;bottom:16px !important;right:16px !important;z-index:2147483646;' +
+    'display:inline-flex;align-items:center;padding:6px 12px 6px 6px;cursor:pointer;' +
+    'background:' + floatBg + ';border:1px solid ' + floatBorder + ';border-radius:4px;' +
+    'backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);' +
+    'box-shadow:' + floatShadow + ';' +
+    'font-family:Inter,-apple-system,BlinkMacSystemFont,\'Segoe UI\',\'Helvetica Neue\',sans-serif;">' +
+    '<span id="mulepage-footer-link" style="display:inline-flex;align-items:center;">' +
+    ICON16_FOOT +
+    '<span style="font-size:11px;font-weight:400;margin:0 4px 0 6px;color:' + byColor + ';">by</span>' +
+    floatBrandSvg +
+    '</span>' +
+    '</div>';
+
+  // --- insert banner (only when mode is "all") ---
+  if (__mr === 'all') {
+    document.body.insertAdjacentHTML('afterbegin', BANNER);
+
+    // brand link click
+    document.getElementById('mulepage-bar-link').addEventListener('click', function () {
+      window.open('https://mulerun.com?utm_source=pages&utm_medium=banner&utm_campaign=pages_branding&utm_content=top_bar', '_blank', 'noopener');
+    });
+
+    // replace favicon
+    var oldIcons = document.querySelectorAll('link[rel="icon"],link[rel="shortcut icon"]');
+    for (var k = 0; k < oldIcons.length; k++) oldIcons[k].remove();
+    var fi = document.createElement('link');
+    fi.rel = 'icon'; fi.type = 'image/svg+xml'; fi.href = 'https://mule.page/favicon.svg';
+    document.head.appendChild(fi);
+
+    // push down normal-flow content (accumulate on existing padding-top)
+    var origPT = parseFloat(getComputedStyle(document.body).paddingTop) || 0;
+    document.body.style.paddingTop = (origPT + BAR_HEIGHT) + 'px';
+
+    // push down all existing position:fixed elements
+    var all = document.querySelectorAll('*');
+    var shifted = [];
+    for (var i = 0; i < all.length; i++) {
+      var el = all[i];
+      if (el.id && el.id.indexOf('mulepage') === 0) continue;
+      var cs = getComputedStyle(el);
+      if (cs.position === 'fixed') {
+        var t = parseFloat(cs.top);
+        if (isNaN(t)) t = 0;
+        el.style.top = (t + BAR_HEIGHT) + 'px';
+        shifted.push({ el: el, orig: t });
+      }
+    }
+
+    // close handler: restore everything
+    document.getElementById('mulepage-bar-close').addEventListener('click', function () {
+      document.getElementById('mulepage-bar').remove();
+      document.body.style.paddingTop = origPT + 'px';
+      for (var j = 0; j < shifted.length; j++) {
+        shifted[j].el.style.top = shifted[j].orig + 'px';
+      }
+    });
+  }
+
+  // --- insert floating widget (only when __mr is set) ---
+  if (__mr) {
+    document.body.insertAdjacentHTML('beforeend', FOOTER);
+
+    // footer link click → open mulerun.com
+    var footerLink = document.getElementById('mulepage-footer-link');
+    if (footerLink) {
+      footerLink.addEventListener('click', function () {
+        window.open('https://mulerun.com/chat?utm_source=pages&utm_medium=banner&utm_campaign=pages_branding&utm_content=bottom_bar', '_blank', 'noopener');
+      });
+    }
+
+    // paid users (footer-only mode): add close button on hover
+    if (__mr === 'footer') {
+      var floatEl = document.getElementById('mulepage-footer');
+      if (floatEl) {
+        var closeBtn = document.createElement('button');
+        closeBtn.className = 'mulepage-float-close';
+        closeBtn.style.color = floatCloseColor;
+        closeBtn.textContent = '\u00d7';
+        closeBtn.addEventListener('mouseenter', function () { closeBtn.style.color = floatCloseHover; });
+        closeBtn.addEventListener('mouseleave', function () { closeBtn.style.color = floatCloseColor; });
+        closeBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          floatEl.remove();
+        });
+        floatEl.appendChild(closeBtn);
+      }
+    }
+  }
+
+  // --- inject canonical link (all users) ---
+  var canon = document.createElement('link');
+  canon.rel = 'canonical';
+  canon.href = 'https://' + location.hostname + '/';
+  document.head.appendChild(canon);
+
+  // --- inject og meta tags (all users) ---
+  var ogDomain = __md;
+  var ogTitle = document.title || ogDomain;
+  var ogTags = [
+    ['og:title', ogTitle],
+    ['og:url', 'https://' + location.hostname + '/'],
+    ['og:type', 'website'],
+    ['og:image', 'https://mule.page/og/' + ogDomain + '.webp']
+  ];
+  for (var n = 0; n < ogTags.length; n++) {
+    var existing = document.querySelector('meta[property="' + ogTags[n][0] + '"]');
+    if (existing) existing.remove();
+    var meta = document.createElement('meta');
+    meta.setAttribute('property', ogTags[n][0]);
+    meta.setAttribute('content', ogTags[n][1]);
+    document.head.appendChild(meta);
+  }
+});
+</script><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>栗子AI | 免费AI图像生成</title>
+<meta name="description" content="栗子AI - 免费AI图像生成工具，支持 GPT Image 2、Nano Banana Pro、Midjourney 等多种模型，一键生成高质量图像">
+<meta name="theme-color" content="#0a0a0f">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌰</text></svg>">
+<meta property="og:title" content="栗子AI | 免费AI图像生成">
+<meta property="og:description" content="支持 GPT Image 2、Nano Banana Pro、Midjourney 等模型，一键生成高质量图像">
+<meta property="og:type" content="website">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #0a0a0f;
+  --glass: rgba(255,255,255,0.06);
+  --glass-border: rgba(255,255,255,0.1);
+  --accent: #c8a2c8;
+  --accent-bright: #e8b4f0;
+  --accent-warm: #f0c8a8;
+  --text: #e8e4e8;
+  --text-muted: rgba(232,228,232,0.5);
+  --glow: rgba(200,162,200,0.3);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg-deep);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+.bg-canvas { position:fixed; inset:0; z-index:0; overflow:hidden; }
+.blob { position:absolute; border-radius:50%; filter:blur(120px); opacity:0.4; animation:float 20s infinite ease-in-out; }
+.blob:nth-child(1) { width:600px; height:600px; background:radial-gradient(circle,#4a2040,transparent 70%); top:-10%; left:-10%; animation-duration:25s; }
+.blob:nth-child(2) { width:500px; height:500px; background:radial-gradient(circle,#204040,transparent 70%); top:50%; right:-5%; animation-duration:22s; animation-delay:-5s; }
+.blob:nth-child(3) { width:400px; height:400px; background:radial-gradient(circle,#404020,transparent 70%); bottom:-5%; left:30%; animation-duration:28s; animation-delay:-10s; }
+.blob:nth-child(4) { width:350px; height:350px; background:radial-gradient(circle,#2a2050,transparent 70%); top:30%; left:50%; animation-duration:18s; animation-delay:-3s; }
+@keyframes float { 0%,100%{transform:translate(0,0) scale(1)} 25%{transform:translate(80px,-60px) scale(1.1)} 50%{transform:translate(-40px,80px) scale(0.9)} 75%{transform:translate(60px,40px) scale(1.05)} }
+.noise { position:fixed; inset:0; z-index:1; pointer-events:none; opacity:0.03; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size:256px; }
+.app { position:relative; z-index:2; max-width:1200px; margin:0 auto; padding:2rem 1.5rem; }
+
+header { text-align:center; padding:3rem 0 4rem; animation:fadeUp 1s ease-out; }
+header h1 {
+  font-family:'Playfair Display',serif; font-size:clamp(2.5rem,6vw,4rem); font-weight:400; letter-spacing:0.02em;
+  background:linear-gradient(135deg,var(--text) 0%,var(--accent-bright) 50%,var(--accent-warm) 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+header p { margin-top:0.75rem; color:var(--text-muted); font-size:0.95rem; font-weight:300; letter-spacing:0.08em; text-transform:uppercase; }
+.model-badges { display:flex; justify-content:center; gap:0.5rem; flex-wrap:wrap; margin-top:1rem; }
+.model-badge {
+  padding:0.3rem 0.7rem; border-radius:20px; font-size:0.7rem; letter-spacing:0.05em;
+  border:1px solid var(--glass-border); background:var(--glass); color:var(--text-muted);
+}
+.model-badge.sota { border-color:rgba(232,180,240,0.3); color:var(--accent-bright); background:rgba(200,162,200,0.1); }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+
+.generator {
+  background:var(--glass); border:1px solid var(--glass-border); border-radius:24px; padding:2rem;
+  backdrop-filter:blur(20px); animation:fadeUp 1s ease-out 0.2s both; position:relative; overflow:hidden;
+}
+.generator::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--accent),transparent); opacity:0.5; }
+
+.prompt-area { position:relative; margin-bottom:1.5rem; }
+.prompt-area label { display:block; font-size:0.8rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-muted); margin-bottom:0.5rem; }
+.prompt-input {
+  width:100%; min-height:100px; padding:1rem 1.25rem; background:rgba(0,0,0,0.3);
+  border:1px solid var(--glass-border); border-radius:16px; color:var(--text);
+  font-family:'DM Sans',sans-serif; font-size:1rem; line-height:1.6; resize:vertical;
+  transition:border-color 0.3s,box-shadow 0.3s;
+}
+.prompt-input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--glow); }
+.prompt-input::placeholder { color:rgba(232,228,232,0.25); }
+
+.controls { display:flex; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem; }
+.control-group { flex:1; min-width:140px; }
+.control-group label { display:block; font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-muted); margin-bottom:0.4rem; }
+.control-group select {
+  width:100%; padding:0.6rem 0.8rem; background:rgba(0,0,0,0.3);
+  border:1px solid var(--glass-border); border-radius:10px; color:var(--text);
+  font-family:'DM Sans',sans-serif; font-size:0.9rem; cursor:pointer; transition:border-color 0.3s;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23999' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 10px center;
+}
+.control-group select:focus { outline:none; border-color:var(--accent); }
+.control-group select option { background:#1a1a2e; color:var(--text); }
+
+.aspect-presets { display:flex; gap:0.5rem; margin-bottom:1.5rem; flex-wrap:wrap; }
+.aspect-btn {
+  padding:0.4rem 0.8rem; background:rgba(0,0,0,0.2); border:1px solid var(--glass-border);
+  border-radius:8px; color:var(--text-muted); font-family:'DM Sans',sans-serif; font-size:0.75rem;
+  letter-spacing:0.05em; cursor:pointer; transition:all 0.3s;
+}
+.aspect-btn:hover { border-color:var(--accent); color:var(--text); }
+.aspect-btn.active { background:rgba(200,162,200,0.15); border-color:var(--accent); color:var(--accent-bright); }
+
+.generate-btn {
+  width:100%; padding:1rem; background:linear-gradient(135deg,rgba(200,162,200,0.2),rgba(240,200,168,0.2));
+  border:1px solid rgba(200,162,200,0.3); border-radius:16px; color:var(--accent-bright);
+  font-family:'Playfair Display',serif; font-size:1.1rem; letter-spacing:0.05em;
+  cursor:pointer; transition:all 0.4s; position:relative; overflow:hidden;
+}
+.generate-btn:hover {
+  background:linear-gradient(135deg,rgba(200,162,200,0.3),rgba(240,200,168,0.3));
+  border-color:var(--accent-bright); transform:translateY(-2px); box-shadow:0 8px 32px rgba(200,162,200,0.2);
+}
+.generate-btn:active { transform:translateY(0); }
+.generate-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+.generate-btn .shimmer { position:absolute; top:0; left:-100%; width:200%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent); animation:shimmer 3s infinite; }
+@keyframes shimmer { 0%{transform:translateX(-50%)} 100%{transform:translateX(50%)} }
+
+.suggestions { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.75rem; }
+.suggestion-chip {
+  padding:0.3rem 0.7rem; background:rgba(200,162,200,0.08); border:1px solid rgba(200,162,200,0.15);
+  border-radius:20px; color:var(--accent); font-size:0.75rem; cursor:pointer; transition:all 0.2s; white-space:nowrap;
+}
+.suggestion-chip:hover { background:rgba(200,162,200,0.15); border-color:var(--accent); }
+
+.loading { display:none; text-align:center; padding:3rem; animation:fadeUp 0.5s ease-out; }
+.loading.visible { display:block; }
+.loading-spinner { width:60px; height:60px; margin:0 auto 1.5rem; position:relative; }
+.loading-spinner::before,.loading-spinner::after { content:''; position:absolute; inset:0; border-radius:50%; border:2px solid transparent; }
+.loading-spinner::before { border-top-color:var(--accent); animation:spin 1s linear infinite; }
+.loading-spinner::after { border-right-color:var(--accent-warm); animation:spin 1.5s linear infinite reverse; inset:6px; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.loading p { color:var(--text-muted); font-size:0.9rem; letter-spacing:0.05em; }
+.loading .model-name { color:var(--accent); font-weight:500; }
+
+.gallery { margin-top:3rem; animation:fadeUp 1s ease-out 0.4s both; }
+.gallery-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; }
+.gallery-header h2 { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:400; }
+.gallery-count { font-size:0.8rem; color:var(--text-muted); letter-spacing:0.05em; }
+.gallery-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1.25rem; }
+
+.gallery-item {
+  position:relative; border-radius:16px; overflow:hidden;
+  background:var(--glass); border:1px solid var(--glass-border); animation:fadeUp 0.6s ease-out both;
+}
+.gallery-item img { width:100%; display:block; transition:transform 0.5s ease; }
+.gallery-item:hover img { transform:scale(1.05); }
+.gallery-item .overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(to top,rgba(10,10,15,0.9) 0%,transparent 50%);
+  opacity:0; transition:opacity 0.3s; display:flex; flex-direction:column; justify-content:flex-end; padding:1rem;
+  pointer-events:none;
+}
+.gallery-item:hover .overlay { opacity:1; }
+.overlay .actions { pointer-events:auto; }
+.overlay .prompt-text { font-size:0.8rem; color:var(--text-muted); line-height:1.4; margin-bottom:0.5rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.overlay .model-tag { font-size:0.65rem; color:var(--accent); letter-spacing:0.05em; text-transform:uppercase; margin-bottom:0.4rem; }
+.overlay .actions { display:flex; gap:0.5rem; }
+.overlay .action-btn {
+  padding:0.4rem 0.8rem; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
+  border-radius:8px; color:var(--text); font-size:0.75rem; cursor:pointer; transition:all 0.2s;
+  font-family:'DM Sans',sans-serif;
+}
+.overlay .action-btn:hover { background:rgba(255,255,255,0.2); }
+
+.empty-state { text-align:center; padding:4rem 2rem; color:var(--text-muted); }
+.empty-state svg { width:80px; height:80px; margin-bottom:1.5rem; opacity:0.3; }
+.empty-state p { font-size:0.95rem; line-height:1.6; }
+
+.toast {
+  position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(100px);
+  background:rgba(255,80,80,0.9); backdrop-filter:blur(10px); padding:0.8rem 1.5rem;
+  border-radius:12px; font-size:0.9rem; z-index:100; transition:transform 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+.toast.visible { transform:translateX(-50%) translateY(0); }
+
+.modal-backdrop {
+  position:fixed; inset:0; background:rgba(0,0,0,0.92); backdrop-filter:blur(16px);
+  z-index:50; display:none; justify-content:center; align-items:center; padding:2rem;
+  animation:fadeIn 0.3s ease-out; cursor:default;
+}
+.modal-backdrop.visible { display:flex; }
+.modal-container {
+  position:relative; max-width:95vw; max-height:95vh; display:flex; flex-direction:column; align-items:center;
+}
+.modal-toolbar {
+  position:absolute; top:-48px; right:0; display:flex; gap:0.5rem; z-index:2;
+}
+.modal-toolbar button {
+  width:36px; height:36px; border-radius:50%; border:1px solid rgba(255,255,255,0.2);
+  background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); color:#e8e4e8;
+  font-size:1.1rem; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center;
+}
+.modal-toolbar button:hover { background:rgba(200,162,200,0.3); border-color:var(--accent); }
+.modal-zoom-info {
+  position:absolute; bottom:-32px; left:50%; transform:translateX(-50%);
+  font-size:0.75rem; color:var(--text-muted); letter-spacing:0.05em; white-space:nowrap;
+  opacity:0; transition:opacity 0.3s;
+}
+.modal-container:hover .modal-zoom-info { opacity:1; }
+.modal-img-wrap {
+  overflow:hidden; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  cursor:grab; touch-action:none; user-select:none; max-width:90vw; max-height:85vh;
+  display:flex; align-items:center; justify-content:center;
+}
+.modal-img-wrap.dragging { cursor:grabbing; }
+.modal-img-wrap img {
+  display:block; transform-origin:center center; transition:transform 0.15s ease-out;
+  pointer-events:none; will-change:transform;
+}
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.dynamic-controls { display:flex; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem; }
+
+/* Mode toggle */
+.mode-toggle { display:flex; gap:0; margin-bottom:1.5rem; background:rgba(0,0,0,0.3); border-radius:12px; padding:4px; border:1px solid var(--glass-border); }
+.mode-btn { flex:1; padding:0.6rem; border:none; border-radius:9px; background:transparent; color:var(--text-muted); font-family:'DM Sans',sans-serif; font-size:0.85rem; cursor:pointer; transition:all 0.3s; letter-spacing:0.05em; }
+.mode-btn.active { background:rgba(200,162,200,0.15); color:var(--accent-bright); }
+.mode-btn:hover:not(.active) { color:var(--text); }
+
+/* Image upload area */
+.img-upload-area { display:none; margin-bottom:1rem; }
+.img-upload-area.visible { display:block; }
+.drop-zone {
+  border:2px dashed rgba(200,162,200,0.25); border-radius:16px; padding:2rem; text-align:center;
+  cursor:pointer; transition:all 0.3s; background:rgba(0,0,0,0.15);
+}
+.drop-zone:hover, .drop-zone.dragover { border-color:var(--accent); background:rgba(200,162,200,0.05); }
+.drop-zone svg { width:40px; height:40px; opacity:0.4; margin-bottom:0.75rem; }
+.drop-zone p { font-size:0.85rem; color:var(--text-muted); line-height:1.5; }
+.drop-zone p strong { color:var(--accent); }
+.drop-zone input[type="file"] { display:none; }
+
+.uploaded-preview { display:flex; gap:0.75rem; margin-top:0.75rem; flex-wrap:wrap; }
+.uploaded-thumb { position:relative; width:80px; height:80px; border-radius:10px; overflow:hidden; border:1px solid var(--glass-border); }
+.uploaded-thumb img { width:100%; height:100%; object-fit:cover; }
+.uploaded-thumb .remove-btn {
+  position:absolute; top:2px; right:2px; width:20px; height:20px; border-radius:50%;
+  background:rgba(0,0,0,0.7); border:none; color:#fff; font-size:12px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; line-height:1;
+}
+.uploaded-thumb .remove-btn:hover { background:rgba(255,80,80,0.8); }
+
+.pick-from-gallery { margin-top:0.75rem; font-size:0.8rem; }
+.pick-from-gallery summary { color:var(--accent); cursor:pointer; font-size:0.8rem; }
+.pick-from-gallery .gallery-pick-grid { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.5rem; }
+.pick-from-gallery .gallery-pick-grid img {
+  width:60px; height:60px; object-fit:cover; border-radius:8px; cursor:pointer;
+  border:2px solid transparent; transition:border-color 0.2s;
+}
+.pick-from-gallery .gallery-pick-grid img:hover { border-color:var(--accent); }
+
+#mulepage-footer { display:none !important; }
+
+@media (max-width:640px) {
+  .app{padding:1rem} header{padding:2rem 0 3rem} .generator{padding:1.25rem;border-radius:18px}
+  .controls{flex-direction:column} .control-group{min-width:100%} .gallery-grid{grid-template-columns:1fr}
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js"></script>
+<script>
+  // FingerprintJS initialization
+  var fpPromise = null;
+  var cachedVisitorId = localStorage.getItem('fp_visitor_id');
+
+  async function initFingerprint() {
+    if (!fpPromise) {
+      fpPromise = FingerprintJS.load();
+    }
+    const fp = await fpPromise;
+    const result = await fp.get();
+    if (result && result.visitorId) {
+      cachedVisitorId = result.visitorId;
+      localStorage.setItem('fp_visitor_id', result.visitorId);
+    }
+    return result.visitorId;
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    initFingerprint().then(function(id) {
+      console.log('FingerprintJS loaded:', id);
+    });
+  });
+</script>
+</head>
+<body>
+
+<div class="bg-canvas">
+  <div class="blob"></div><div class="blob"></div><div class="blob"></div><div class="blob"></div>
+</div>
+<div class="noise"></div>
+
+<div class="app">
+  <header>
+    <h1>栗子AI</h1>
+    <p>Powered by ChatGPT &amp; Gemini Banana</p>
+    <div class="model-badges">
+      <span class="model-badge sota">GPT Image 2</span>
+      <span class="model-badge sota">Nano Banana Pro</span>
+      <span class="model-badge sota">Nano Banana 2</span>
+      <span class="model-badge">Nano Banana</span>
+      <span class="model-badge">Pollinations Flux</span>
+      <span class="model-badge">Pollinations 写实</span>
+      <span class="model-badge">Pollinations 动漫</span>
+      <span class="model-badge">Pollinations 3D</span>
+      <span class="model-badge">Pollinations 极速</span>
+      <span class="model-badge sota">Midjourney</span>
+    </div>
+    <!-- User System UI -->
+    <div id="userSystem" style="margin-top:1rem;display:flex;gap:0.8rem;justify-content:center;align-items:center;flex-wrap:wrap;">
+      <div id="loginPrompt" style="display:flex;gap:0.8rem;align-items:center;">
+        <button onclick="showLoginModal()" style="padding:0.5rem 1.2rem;background:var(--accent);color:var(--bg);border:none;border-radius:8px;font-weight:500;cursor:pointer;transition:all 0.2s;">登录</button>
+        <button onclick="showRegisterModal()" style="padding:0.5rem 1.2rem;background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:8px;font-weight:500;cursor:pointer;transition:all 0.2s;">注册</button>
+        <span style="font-size:0.85rem;color:var(--text-muted);">请登录后使用</span>
+      </div>
+      <div id="userInfo" style="display:none;gap:1rem;align-items:center;">
+        <div style="background:var(--surface);padding:0.5rem 1rem;border-radius:8px;border:1px solid var(--border);">
+          <span style="font-size:0.85rem;color:var(--text-muted);">余额: </span>
+          <span id="userBalance" style="font-weight:600;color:var(--accent);">¥0.00</span>
+        </div>
+        <button onclick="showRechargeModal()" style="padding:0.5rem 1rem;background:var(--accent);color:var(--bg);border:none;border-radius:8px;font-weight:500;cursor:pointer;">充值</button>
+        <button onclick="logout()" style="padding:0.5rem 1rem;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:8px;font-size:0.85rem;cursor:pointer;">退出</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Login Modal -->
+  <div id="loginModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;display:none;align-items:center;justify-content:center;">
+    <div style="background:var(--surface);padding:2rem;border-radius:12px;width:90%;max-width:400px;border:1px solid var(--border);">
+      <h3 style="margin:0 0 1.5rem 0;color:var(--accent);">登录</h3>
+      <input id="loginPhone" type="tel" placeholder="手机号" style="width:100%;padding:0.8rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);margin-bottom:1rem;">
+      <input id="loginPassword" type="password" placeholder="密码" style="width:100%;padding:0.8rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);margin-bottom:1rem;">
+      <button onclick="doLogin()" style="width:100%;padding:0.8rem;background:var(--accent);color:var(--bg);border:none;border-radius:8px;font-weight:600;cursor:pointer;margin-bottom:1rem;">登录</button>
+      <p style="text-align:center;font-size:0.85rem;color:var(--text-muted);">还没有账号？<a href="#" onclick="showRegisterModal()" style="color:var(--accent);">立即注册</a></p>
+      <button onclick="closeLoginModal()" style="width:100%;padding:0.6rem;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:8px;cursor:pointer;">取消</button>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div id="registerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;display:none;align-items:center;justify-content:center;">
+    <div style="background:var(--surface);padding:2rem;border-radius:12px;width:90%;max-width:400px;border:1px solid var(--border);">
+      <h3 style="margin:0 0 1.5rem 0;color:var(--accent);">注册</h3>
+      <input id="registerPhone" type="tel" placeholder="手机号" style="width:100%;padding:0.8rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);margin-bottom:1rem;">
+      <input id="registerPassword" type="password" placeholder="密码（大小写+符号，至少6位）" style="width:100%;padding:0.8rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);margin-bottom:1rem;">
+      <input id="registerPassword2" type="password" placeholder="确认密码" style="width:100%;padding:0.8rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);margin-bottom:1rem;">
+      <button onclick="doRegister()" style="width:100%;padding:0.8rem;background:var(--accent);color:var(--bg);border:none;border-radius:8px;font-weight:600;cursor:pointer;margin-bottom:1rem;">注册</button>
+      <p style="text-align:center;font-size:0.85rem;color:var(--text-muted);">已有账号？<a href="#" onclick="showLoginModal()" style="color:var(--accent);">立即登录</a></p>
+      <button onclick="closeRegisterModal()" style="width:100%;padding:0.6rem;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:8px;cursor:pointer;">取消</button>
+    </div>
+  </div>
+
+  <!-- Recharge Modal -->
+  <div id="rechargeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;display:none;align-items:center;justify-content:center;">
+    <div style="background:var(--surface);padding:2rem;border-radius:12px;width:90%;max-width:400px;border:1px solid var(--border);max-height:90vh;overflow-y:auto;">
+      <h3 style="margin:0 0 1rem 0;color:var(--accent);text-align:center;">充值</h3>
+      <div style="text-align:center;margin-bottom:1rem;">
+        <img src="/qrcode.jpg" alt="支付宝收款码" style="max-width:250px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);" />
+      </div>
+      <div style="background:rgba(200,162,200,0.1);border:1px solid rgba(200,162,200,0.3);border-radius:8px;padding:1rem;margin-bottom:1rem;">
+        <p style="font-size:0.9rem;color:var(--text);margin:0 0 0.5rem 0;"><strong>充值步骤：</strong></p>
+        <ol style="font-size:0.85rem;color:var(--text-muted);margin:0;padding-left:1.2rem;line-height:1.6;">
+          <li>截图保存上方收款码</li>
+          <li>打开支付宝扫码支付</li>
+          <li>支付后联系客服确认</li>
+          <li>余额将在确认后自动到账</li>
+        </ol>
+      </div>
+      <p style="text-align:center;font-size:0.8rem;color:var(--text-muted);margin-bottom:1rem;">客服微信：栗子素材网</p>
+      <button onclick="closeRechargeModal()" style="width:100%;padding:0.8rem;background:var(--accent);color:var(--bg);border:none;border-radius:8px;font-weight:600;cursor:pointer;">我知道了</button>
+    </div>
+  </div>
+
+  <div class="generator">
+    <!-- Mode Toggle -->
+    <div class="mode-toggle">
+      <button class="mode-btn active" data-mode="t2i" id="modeT2I">✏️ 文生图</button>
+      <button class="mode-btn" data-mode="i2i" id="modeI2I">🖼️ 图生图</button>
+    </div>
+
+    <!-- Image Upload Area (i2i mode) -->
+    <div class="img-upload-area" id="imgUploadArea">
+      <div class="drop-zone" id="dropZone">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <path d="M21 15l-5-5L5 21"/>
+        </svg>
+        <p>拖拽图片到此处，或 <strong>点击选择</strong></p>
+        <p style="font-size:0.75rem;margin-top:0.25rem;">支持 PNG / JPG / WebP，最大 20MB</p>
+        <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp">
+      </div>
+      <div class="uploaded-preview" id="uploadedPreview"></div>
+      <details class="pick-from-gallery" id="pickFromGallery" style="display:none;">
+        <summary>从作品集中选择图片</summary>
+        <div class="gallery-pick-grid" id="galleryPickGrid"></div>
+      </details>
+    </div>
+
+    <div class="prompt-area">
+      <label>描述你想生成的图像</label>
+      <textarea class="prompt-input" id="promptInput" placeholder="A crystalline forest under aurora borealis, bioluminescent mushrooms glowing softly, ethereal mist weaving through ancient trees, cinematic lighting, ultra detailed..."></textarea>
+      <div class="suggestions">
+        <span class="suggestion-chip" data-prompt="A serene Japanese garden with cherry blossoms falling into a koi pond, watercolor style, soft lighting, peaceful atmosphere">和风庭园</span>
+        <span class="suggestion-chip" data-prompt="Cyberpunk cityscape at night, neon signs reflecting on wet streets, flying cars, rain, blade runner aesthetic, volumetric lighting">赛博朋克城市</span>
+        <span class="suggestion-chip" data-prompt="An ancient library with infinite shelves, floating books, golden dust particles, warm candlelight, fantasy art, detailed illustration">奇幻图书馆</span>
+        <span class="suggestion-chip" data-prompt="A majestic lion made entirely of ocean waves, photorealistic, dramatic ocean spray, golden hour, cinematic">海浪狮子</span>
+        <span class="suggestion-chip" data-prompt="Steampunk airship floating above Victorian London, copper and brass details, sunset sky with dramatic clouds, concept art">蒸汽朋克飞船</span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="control-group">
+        <label>AI 模型 <button onclick="openPricingTable()" style="float:right;background:rgba(212,168,83,.15);color:#d4a853;border:1px solid rgba(212,168,83,.3);border-radius:4px;padding:2px 8px;font-size:.7rem;cursor:pointer;font-weight:500;letter-spacing:.03em;">查看价格表</button></label>
+        <select id="modelSelect">
+          <option value="nano-banana-pro" data-mode="t2i">Nano Banana Pro (推荐)</option>
+          <option value="gpt-image-2" data-mode="t2i">ChatGPT GPT Image 2</option>
+          <option value="nano-banana-2" data-mode="t2i">Nano Banana 2</option>
+          <option value="nano-banana" data-mode="t2i">Nano Banana</option>
+          <option value="pollinations" data-mode="t2i">Pollinations Flux (免费)</option>
+          <option value="pollinations-realism" data-mode="t2i">Pollinations 写实 (免费)</option>
+          <option value="pollinations-anime" data-mode="t2i">Pollinations 动漫 (免费)</option>
+          <option value="pollinations-3d" data-mode="t2i">Pollinations 3D (免费)</option>
+          <option value="pollinations-turbo" data-mode="t2i">Pollinations 极速 (免费)</option>
+          <option value="midjourney" data-mode="t2i">Midjourney</option>
+          <option value="nano-banana-pro-edit" data-mode="i2i" style="display:none;">Nano Banana Pro 图生图</option>
+          <option value="nano-banana-2-edit" data-mode="i2i" style="display:none;">Nano Banana 2 图生图</option>
+          <option value="gpt-image-2-edit" data-mode="i2i" style="display:none;">GPT Image 2 图生图</option>
+          <option value="pollinations-i2i" data-mode="i2i" style="display:none;">Pollinations 免费图生图</option>
+        </select>
+      </div>
+      <div class="control-group" id="qualityGroup" style="display: none;">
+        <label>品质</label>
+        <select id="qualitySelect">
+          <option value="auto">Auto (推荐)</option>
+          <option value="low">Low (快速)</option>
+        </select>
+      </div>
+      <div class="control-group" id="resolutionGroup">
+        <label>分辨率</label>
+        <select id="resolutionSelect">
+          <option value="2K">2K</option>
+          <option value="1K">1K</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="aspect-presets" id="aspectPresets">
+      <button class="aspect-btn active" data-ratio="1:1">1:1</button>
+      <button class="aspect-btn" data-ratio="3:2">3:2</button>
+      <button class="aspect-btn" data-ratio="2:3">2:3</button>
+      <button class="aspect-btn" data-ratio="4:3">4:3</button>
+      <button class="aspect-btn" data-ratio="3:4">3:4</button>
+      <button class="aspect-btn" data-ratio="16:9">16:9</button>
+      <button class="aspect-btn" data-ratio="9:16">9:16</button>
+      <button class="aspect-btn" data-ratio="21:9">21:9</button>
+    </div>
+    <div class="ratio-hint" id="ratioHint" style="display:none;font-size:0.75rem;color:var(--text-muted);margin-top:-1rem;margin-bottom:1rem;">* GPT Image 2 仅支持 1:1、3:2、2:3、16:9、9:16 比例</div>
+
+    <button class="generate-btn" id="generateBtn">
+      <span class="shimmer"></span>
+      <span class="btn-text">生成图像</span>
+    </button>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="loading-spinner"></div>
+    <p>正在使用 <span class="model-name" id="loadingModel">Nano Banana Pro</span> 创作中...</p>
+    <button class="cancel-btn" id="cancelBtn" style="margin-top:1rem;padding:0.5rem 1.5rem;background:rgba(255,80,80,0.15);border:1px solid rgba(255,80,80,0.3);border-radius:10px;color:rgba(255,120,120,1);font-family:'DM Sans',sans-serif;font-size:0.85rem;cursor:pointer;transition:all 0.2s;">取消生成</button>
+  </div>
+
+  <div class="gallery" id="gallery">
+    <div class="gallery-header">
+      <h2>作品集</h2>
+      <span class="gallery-count" id="galleryCount">0 张图像</span>
+    </div>
+    <div class="gallery-grid" id="galleryGrid">
+      <div class="empty-state" id="emptyState">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <circle cx="8.5" cy="8.5" r="1.5"></circle>
+          <polyline points="21 15 16 10 5 21"></polyline>
+        </svg>
+        <p>选择 AI 模型，输入描述并点击「生成图像」<br>你的创作将显示在这里</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="modal-backdrop" id="modal">
+  <div class="modal-container">
+    <div class="modal-toolbar">
+      <button onclick="modalZoom(-1)" title="缩小">−</button>
+      <button onclick="modalZoom(1)" title="放大">+</button>
+      <button onclick="modalReset()" title="重置">⊙</button>
+      <button onclick="modalDownload()" title="下载">↓</button>
+      <button onclick="closeModal()" title="关闭">✕</button>
+    </div>
+    <div class="modal-img-wrap" id="modalWrap">
+      <img id="modalImg" src="" alt="">
+    </div>
+    <div class="modal-zoom-info" id="modalZoomInfo">滚轮缩放 · 拖拽平移 · 双击重置</div>
+  </div>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const promptInput = $('#promptInput');
+const modelSelect = $('#modelSelect');
+const qualitySelect = $('#qualitySelect');
+const resolutionSelect = $('#resolutionSelect');
+const qualityGroup = $('#qualityGroup');
+const resolutionGroup = $('#resolutionGroup');
+const aspectPresets = $('#aspectPresets');
+const ratioHint = $('#ratioHint');
+const generateBtn = $('#generateBtn');
+const cancelBtn = $('#cancelBtn');
+const loading = $('#loading');
+const loadingModel = $('#loadingModel');
+const galleryGrid = $('#galleryGrid');
+const galleryCount = $('#galleryCount');
+const toast = $('#toast');
+const modal = $('#modal');
+const modalImg = $('#modalImg');
+
+let imageCount = 0;
+let isGenerating = false;
+let currentRatio = '1:1';
+let galleryData = []; // {url, prompt, model, timestamp}
+let cancelFlag = false; // #12: cancel generation
+let currentMode = 't2i'; // 't2i' or 'i2i'
+let uploadedImages = []; // base64 data URLs for i2i
+
+const MODEL_NAMES = {
+  'nano-banana-pro': 'Nano Banana Pro',
+  'gpt-image-2': 'ChatGPT GPT Image 2',
+  'nano-banana-2': 'Nano Banana 2',
+  'nano-banana': 'Nano Banana',
+  'midjourney': 'Midjourney',
+  'pollinations': 'Pollinations Flux (免费)',
+  'pollinations-realism': 'Pollinations 写实 (免费)',
+  'pollinations-anime': 'Pollinations 动漫 (免费)',
+  'pollinations-3d': 'Pollinations 3D (免费)',
+  'pollinations-turbo': 'Pollinations 极速 (免费)',
+  'nano-banana-pro-edit': 'Nano Banana Pro 图生图',
+  'nano-banana-2-edit': 'Nano Banana 2 图生图',
+  'gpt-image-2-edit': 'GPT Image 2 图生图',
+  'pollinations-i2i': 'Pollinations 免费图生图'
+};
+
+// GPT size mapping
+const GPT_SIZE_MAP = {
+  '1:1': '1024x1024', '3:2': '1536x1024', '2:3': '1024x1536',
+  '16:9': '1536x1024', '9:16': '1024x1536'
+};
+
+// === Utility: HTML-escape prompt (#3) ===
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// === Utility: safely encode for onclick attributes (#2) ===
+function safeAttr(str) {
+  return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+// === Toast ===
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add('visible');
+  setTimeout(() => toast.classList.remove('visible'), 4000);
+}
+
+// === localStorage persistence ===
+function saveGallery() {
+  try {
+    localStorage.setItem('chestnut_ai_gallery', JSON.stringify(galleryData));
+  } catch (e) {
+    console.warn('Could not save gallery to localStorage:', e.message);
+  }
+}
+
+function loadGallery() {
+  try {
+    const saved = localStorage.getItem('chestnut_ai_gallery');
+    if (!saved) return;
+    const items = JSON.parse(saved);
+    if (!Array.isArray(items) || items.length === 0) return;
+
+    // #1 & #15: restore galleryData AND imageCount
+    galleryData = items;
+
+    const empty = document.getElementById('emptyState');
+    if (empty) empty.remove();
+
+    items.forEach(item => {
+      addToGallery(item.url, item.prompt, item.model);
+    });
+    // imageCount is updated inside addToGallery
+  } catch (e) {
+    console.warn('Could not load gallery from localStorage:', e.message);
+  }
+}
+
+function addToGallery(imgUrl, prompt, model) {
+  const safeUrl = safeAttr(imgUrl);
+  const safePrompt = safeAttr(prompt);
+  const displayPrompt = escapeHtml(prompt);
+  const item = document.createElement('div');
+  item.className = 'gallery-item';
+  item.innerHTML = `
+    <img src="${imgUrl}" alt="${displayPrompt}" loading="lazy">
+    <div class="overlay">
+      <div class="model-tag">${MODEL_NAMES[model] || model}</div>
+      <div class="prompt-text">${displayPrompt}</div>
+      <div class="actions">
+        <button class="action-btn" onclick="downloadImage('${safeUrl}','${model}-${Date.now()}.png')">下载 PNG</button>
+        <button class="action-btn" onclick="reusePrompt('${safePrompt}')">重用提示词</button>
+        <button class="action-btn" onclick="deleteImage(this,'${safeUrl}')">删除</button>
+      </div>
+    </div>
+  `;
+  galleryGrid.insertBefore(item, galleryGrid.firstChild);
+  imageCount++;
+  galleryCount.textContent = `${imageCount} 张图像`;
+}
+
+function deleteImage(btn, url) {
+  galleryData = galleryData.filter(g => g.url !== url);
+  saveGallery();
+  const item = btn.closest('.gallery-item');
+  if (item) item.remove();
+  imageCount = Math.max(0, imageCount - 1);
+  galleryCount.textContent = `${imageCount} 张图像`;
+  if (imageCount === 0) {
+    galleryGrid.innerHTML = `<div class="empty-state" id="emptyState">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21 15 16 10 5 21"/>
+      </svg>
+      <p>选择 AI 模型，输入描述并点击「生成图像」<br>你的创作将显示在这里</p>
+    </div>`;
+  }
+}
+
+// Download via proxy
+function downloadImage(url, filename) {
+  const proxyUrl = 'https://herng9d2.mule.page/api/image-proxy?url=' + encodeURIComponent(url);
+  fetch(proxyUrl).then(r => {
+    if (!r.ok) throw new Error('Download failed');
+    return r.blob();
+  }).then(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }).catch(() => showToast('下载失败'));
+}
+
+function reusePrompt(p) {
+  promptInput.value = p;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// === Toggle controls based on selected model ===
+function updateControls() {
+  const model = modelSelect.value;
+  const usesGptSizes = model === 'gpt-image-2' || model === 'gpt-image-2-edit';
+  const usesEditModel = model.endsWith('-edit') || model.endsWith('-i2i');
+
+  // Show/hide quality (GPT t2i only)
+  qualityGroup.style.display = model === 'gpt-image-2' ? '' : 'none';
+
+  // Show/hide resolution (Banana Pro & 2, including edit)
+  resolutionGroup.style.display = (
+    model === 'nano-banana-pro' || model === 'nano-banana-2' ||
+    model === 'nano-banana-pro-edit' || model === 'nano-banana-2-edit'
+  ) ? '' : 'none';
+
+  // Show/hide ratio hint
+  ratioHint.style.display = usesGptSizes ? '' : 'none';
+
+  // Aspect presets
+  if (usesGptSizes) {
+    aspectPresets.querySelectorAll('.aspect-btn').forEach(btn => {
+      const ratio = btn.dataset.ratio;
+      btn.style.display = GPT_SIZE_MAP[ratio] ? '' : 'none';
+    });
+    if (!GPT_SIZE_MAP[currentRatio]) {
+      aspectPresets.querySelectorAll('.aspect-btn').forEach(b => b.classList.remove('active'));
+      const defaultBtn = aspectPresets.querySelector('[data-ratio="1:1"]');
+      if (defaultBtn) defaultBtn.classList.add('active');
+      currentRatio = '1:1';
+    }
+  } else {
+    aspectPresets.querySelectorAll('.aspect-btn').forEach(btn => btn.style.display = '');
+  }
+
+  // Update prompt label
+  const promptLabel = document.querySelector('.prompt-area label');
+  if (promptLabel) {
+    promptLabel.textContent = usesEditModel ? '描述你想编辑的内容' : '描述你想生成的图像';
+  }
+
+  // Update generate button text
+  const btnText = document.querySelector('.btn-text');
+  if (btnText) {
+    btnText.textContent = usesEditModel ? '编辑图像' : '生成图像';
+  }
+}
+
+modelSelect.addEventListener('change', updateControls);
+updateControls();
+
+// === Mode Toggle (t2i / i2i) ===
+const modeT2I = $('#modeT2I');
+const modeI2I = $('#modeI2I');
+const imgUploadArea = $('#imgUploadArea');
+
+function switchMode(mode) {
+  currentMode = mode;
+  modeT2I.classList.toggle('active', mode === 't2i');
+  modeI2I.classList.toggle('active', mode === 'i2i');
+  imgUploadArea.classList.toggle('visible', mode === 'i2i');
+
+  // Filter model options by mode
+  modelSelect.querySelectorAll('option').forEach(opt => {
+    const optMode = opt.dataset.mode;
+    if (!optMode) return;
+    opt.style.display = optMode === mode ? '' : 'none';
+  });
+
+  // Select first available model for this mode
+  const firstVisible = modelSelect.querySelector(`option[data-mode="${mode}"]`);
+  if (firstVisible) {
+    modelSelect.value = firstVisible.value;
+    updateControls();
+  }
+
+  // Update gallery pick visibility
+  updateGalleryPick();
+}
+
+modeT2I.addEventListener('click', () => switchMode('t2i'));
+modeI2I.addEventListener('click', () => switchMode('i2i'));
+
+// === Image Upload (i2i) ===
+const dropZone = $('#dropZone');
+const fileInput = $('#fileInput');
+const uploadedPreview = $('#uploadedPreview');
+const pickFromGallery = $('#pickFromGallery');
+const galleryPickGrid = $('#galleryPickGrid');
+
+function updateGalleryPick() {
+  if (currentMode === 'i2i' && galleryData.length > 0) {
+    pickFromGallery.style.display = '';
+    galleryPickGrid.innerHTML = '';
+    galleryData.forEach(item => {
+      const img = document.createElement('img');
+      img.src = item.url;
+      img.title = item.prompt;
+      img.addEventListener('click', () => addImageByUrl(item.url));
+      galleryPickGrid.appendChild(img);
+    });
+  } else {
+    pickFromGallery.style.display = 'none';
+  }
+}
+
+async function addImageByUrl(url) {
+  if (uploadedImages.length >= 4) { showToast('最多上传 4 张图片'); return; }
+  try {
+    const resp = await fetch('https://herng9d2.mule.page/api/image-proxy?url=' + encodeURIComponent(url));
+    if (!resp.ok) throw new Error('Failed');
+    const blob = await resp.blob();
+    const dataUrl = await blobToDataUrl(blob);
+    uploadedImages.push(dataUrl);
+    renderUploaded();
+  } catch (e) {
+    showToast('图片加载失败');
+  }
+}
+
+function blobToDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function handleFiles(files) {
+  for (const file of files) {
+    if (uploadedImages.length >= 4) { showToast('最多上传 4 张图片'); break; }
+    if (file.size > 20 * 1024 * 1024) { showToast(`${file.name} 超过 20MB`); continue; }
+    if (!file.type.startsWith('image/')) continue;
+    const dataUrl = await blobToDataUrl(file);
+    uploadedImages.push(dataUrl);
+  }
+  renderUploaded();
+}
+
+function renderUploaded() {
+  uploadedPreview.innerHTML = '';
+  uploadedImages.forEach((url, i) => {
+    const thumb = document.createElement('div');
+    thumb.className = 'uploaded-thumb';
+    thumb.innerHTML = `<img src="${url}" alt="uploaded"><button class="remove-btn" data-idx="${i}">&times;</button>`;
+    thumb.querySelector('.remove-btn').addEventListener('click', () => {
+      uploadedImages.splice(i, 1);
+      renderUploaded();
+    });
+    uploadedPreview.appendChild(thumb);
+  });
+}
+
+// Click to upload
+dropZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', (e) => {
+  if (e.target.files.length) handleFiles(e.target.files);
+  e.target.value = '';
+});
+
+// Drag & drop
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+});
+
+// Aspect preset buttons
+aspectPresets.addEventListener('click', (e) => {
+  const btn = e.target.closest('.aspect-btn');
+  if (!btn) return;
+  aspectPresets.querySelectorAll('.aspect-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentRatio = btn.dataset.ratio;
+});
+
+// Suggestion chips
+document.querySelectorAll('.suggestion-chip').forEach(chip => {
+  chip.addEventListener('click', () => { promptInput.value = chip.dataset.prompt; promptInput.focus(); });
+});
+
+// === Cancel button (#12) ===
+cancelBtn.addEventListener('click', () => {
+  cancelFlag = true;
+  isGenerating = false;
+  generateBtn.disabled = false;
+  loading.classList.remove('visible');
+  showToast('已取消生成');
+});
+
+// === Generate (#13: preserve original prompt for display) ===
+async function generateImage() {
+  const originalPrompt = promptInput.value.trim();
+  if (!originalPrompt) { showToast('请输入图像描述'); return; }
+  if (isGenerating) return;
+
+  const model = modelSelect.value;
+  const isEditModel = model.endsWith('-edit');
+
+  // Check balance before generating
+  const balanceCheck = await checkBalance(model);
+  if (!balanceCheck.allowed) return;
+  const isFreeGen = balanceCheck.free || balanceCheck.dailyFree || false;
+
+  // Validate i2i: must have at least one image
+  if (isEditModel && uploadedImages.length === 0) {
+    showToast('请上传至少一张参考图片');
+    return;
+  }
+
+  isGenerating = true;
+  cancelFlag = false;
+  generateBtn.disabled = true;
+  loadingModel.textContent = MODEL_NAMES[model];
+  loading.classList.add('visible');
+
+  const body = { model, prompt: originalPrompt };
+
+  if (model === 'gpt-image-2') {
+    body.quality = qualitySelect.value;
+    body.size = GPT_SIZE_MAP[currentRatio] || '1024x1024';
+  } else if (model === 'gpt-image-2-edit') {
+    body.images = [...uploadedImages];
+    body.size = GPT_SIZE_MAP[currentRatio] || '1024x1024';
+  } else if (model === 'midjourney') {
+    const arMap = { '1:1':'1:1','3:2':'3:2','2:3':'2:3','4:3':'4:3','3:4':'3:4','16:9':'16:9','9:16':'9:16','21:9':'21:9','5:4':'5:4','4:5':'4:5' };
+    body.prompt = `${originalPrompt} --ar ${arMap[currentRatio] || '1:1'}`;
+  } else if (model === 'nano-banana-pro-edit' || model === 'nano-banana-2-edit') {
+    body.images = [...uploadedImages];
+    body.aspect_ratio = currentRatio;
+    body.resolution = resolutionSelect.value;
+  } else {
+    body.aspect_ratio = currentRatio;
+    if (model === 'nano-banana-pro' || model === 'nano-banana-2') {
+      body.resolution = resolutionSelect.value;
+    }
+  }
+
+  // Use originalPrompt (without --ar) for gallery display (#13)
+  const displayPrompt = originalPrompt;
+
+  // === Pollinations: no API needed, construct URL directly ===
+  const POLLINATIONS_MODELS = {
+    'pollinations': 'flux',
+    'pollinations-realism': 'flux-realism',
+    'pollinations-anime': 'flux-anime',
+    'pollinations-3d': 'flux-3d',
+    'pollinations-turbo': 'turbo'
+  };
+  
+  // Pollinations i2i (image-to-image with reference image)
+  if (model === 'pollinations-i2i') {
+    if (uploadedImages.length === 0) {
+      showToast('请先上传参考图片');
+      isGenerating = false;
+      generateBtn.disabled = false;
+      loading.classList.remove('visible');
+      return;
+    }
+    
+    try {
+      // Convert data URL to file and upload to catbox.moe via backend
+      const dataUrl = uploadedImages[0];
+      const base64 = dataUrl.split(',')[1];
+      const mime = dataUrl.split(';')[0].split(':')[1];
+      const byteString = atob(base64);
+      const arrayBuffer = new ArrayBuffer(byteString.length);
+      const uint8Array = new Uint8Array(arrayBuffer);
+      for (let i = 0; i < byteString.length; i++) {
+        uint8Array[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([arrayBuffer], { type: mime });
+      
+      const formData = new FormData();
+      formData.append('image', blob, 'reference.png');
+      
+      const hostResp = await fetch('https://herng9d2.mule.page/api/host-image', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!hostResp.ok) {
+        throw new Error('图片托管失败');
+      }
+      
+      const { url: refImageUrl } = await hostResp.json();
+      
+      // Construct Pollinations i2i URL
+      const ratioToSize = {
+        '1:1': [1024,1024], '3:2': [1536,1024], '2:3': [1024,1536],
+        '4:3': [1360,1024], '3:4': [1024,1360], '16:9': [1792,1024],
+        '9:16': [1024,1792], '21:9': [1792,768]
+      };
+      const [w, h] = ratioToSize[currentRatio] || [1024, 1024];
+      const seed = Math.floor(Math.random() * 1000000);
+      const polModel = 'flux'; // Use flux for i2i
+      
+      const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(originalPrompt)}?model=${polModel}&width=${w}&height=${h}&image=${encodeURIComponent(refImageUrl)}&nologo=true&seed=${seed}`;
+      
+      await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = resolve;
+        img.onerror = () => reject(new Error('图像生成失败'));
+        img.src = imgUrl;
+        setTimeout(() => reject(new Error('生成超时，请稍后再试')), 90000);
+      });
+      
+      const empty = document.getElementById('emptyState');
+      if (empty) empty.remove();
+      addToGallery(imgUrl, displayPrompt, model);
+      galleryData.unshift({ url: imgUrl, prompt: displayPrompt, model, timestamp: Date.now() });
+      saveGallery();
+      await deductBalance(model, displayPrompt, imgUrl, true);
+    } catch (err) {
+      showToast(err.message || '图生图失败，请稍后再试');
+    } finally {
+      isGenerating = false;
+      generateBtn.disabled = false;
+      loading.classList.remove('visible');
+    }
+    return;
+  }
+  
+  if (POLLINATIONS_MODELS[model]) {
+    const ratioToSize = {
+      '1:1': [1024,1024], '3:2': [1536,1024], '2:3': [1024,1536],
+      '4:3': [1360,1024], '3:4': [1024,1360], '16:9': [1792,1024],
+      '9:16': [1024,1792], '21:9': [1792,768]
+    };
+    const [w, h] = ratioToSize[currentRatio] || [1024, 1024];
+    const seed = Math.floor(Math.random() * 1000000);
+    const polModel = POLLINATIONS_MODELS[model];
+    const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(originalPrompt)}?model=${polModel}&width=${w}&height=${h}&nologo=true&seed=${seed}`;
+
+    try {
+      await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = resolve;
+        img.onerror = () => reject(new Error('图像生成失败'));
+        img.src = imgUrl;
+        setTimeout(() => reject(new Error('生成超时，请稍后再试')), 90000);
+      });
+
+      const empty = document.getElementById('emptyState');
+      if (empty) empty.remove();
+      addToGallery(imgUrl, displayPrompt, model);
+      galleryData.unshift({ url: imgUrl, prompt: displayPrompt, model, timestamp: Date.now() });
+      saveGallery();
+      await deductBalance(model, displayPrompt, imgUrl, true);
+    } catch (err) {
+      showToast(err.message || '生成失败，请稍后再试');
+    } finally {
+      isGenerating = false;
+      generateBtn.disabled = false;
+      loading.classList.remove('visible');
+    }
+    return;
+  }
+
+  try {
+    const resp = await fetch('https://herng9d2.mule.page/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    const data = await resp.json();
+
+    if (!resp.ok) {
+      throw new Error(data.error || '生成失败');
+    }
+
+    const taskId = data.taskId;
+    if (!taskId) {
+      if (data.images && data.images.length > 0) {
+        const empty = document.getElementById('emptyState');
+        if (empty) empty.remove();
+        data.images.forEach(imgUrl => {
+          addToGallery(imgUrl, displayPrompt, model);
+          galleryData.unshift({ url: imgUrl, prompt: displayPrompt, model, timestamp: Date.now() });
+        });
+        saveGallery();
+        await deductBalance(model, displayPrompt, data.images[0], isFreeGen);
+        return;
+      }
+      throw new Error('未返回任务');
+    }
+
+    // Poll every 3 seconds via POST /api/poll, up to 5 minutes
+    const maxPolls = 100;
+    let polls = 0;
+    let consecutiveErrors = 0; // #14: track consecutive failures
+
+    while (polls < maxPolls) {
+      await new Promise(r => setTimeout(r, 3000));
+
+      // #12: check cancel
+      if (cancelFlag) {
+        showToast('已取消生成');
+        return;
+      }
+
+      polls++;
+
+      try {
+        const pollResp = await fetch('https://herng9d2.mule.page/api/poll', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ taskId: data.taskId, apiPath: data.apiPath, resultKey: data.resultKey })
+        });
+
+        if (!pollResp.ok) {
+          consecutiveErrors++;
+          if (consecutiveErrors >= 5) {
+            showToast('网络连接不稳定，正在重试...');
+          }
+          continue;
+        }
+
+        consecutiveErrors = 0; // reset on success
+        const pollData = await pollResp.json();
+
+        if (pollData.status === 'completed') {
+          const images = pollData.images || [];
+          if (images.length === 0) throw new Error('未返回图像');
+
+          const empty = document.getElementById('emptyState');
+          if (empty) empty.remove();
+
+          images.forEach(imgUrl => {
+            addToGallery(imgUrl, displayPrompt, model);
+            galleryData.unshift({ url: imgUrl, prompt: displayPrompt, model, timestamp: Date.now() });
+          });
+          saveGallery();
+          await deductBalance(model, displayPrompt, images[0], isFreeGen);
+          return;
+        }
+
+        if (pollData.status === 'failed') {
+          throw new Error(pollData.error || '生成失败');
+        }
+      } catch (pollErr) {
+        if (pollErr.message && (pollErr.message === '生成失败' || pollErr.message === '未返回图像')) {
+          throw pollErr;
+        }
+        // network error — continue polling
+      }
+    }
+    throw new Error('生成超时，请稍后再试');
+
+  } catch (err) {
+    if (!cancelFlag) {
+      showToast(err.message || '生成失败，请稍后再试');
+    }
+    console.error('Error:', err);
+  } finally {
+    isGenerating = false;
+    generateBtn.disabled = false;
+    loading.classList.remove('visible');
+  }
+}
+
+// === Modal with zoom & pan (#4: removed unused prev variable) ===
+const modalWrap = $('#modalWrap');
+const modalZoomInfo = $('#modalZoomInfo');
+let mz = { scale: 1, x: 0, y: 0, dragging: false, startX: 0, startY: 0, startTx: 0, startTy: 0, currentSrc: '' };
+
+function openModal(src) {
+  mz = { scale: 0.35, x: 0, y: 0, dragging: false, startX: 0, startY: 0, startTx: 0, startTy: 0, currentSrc: src };
+  modalImg.src = src;
+  applyZoom();
+  modal.classList.add('visible');
+}
+
+function closeModal() {
+  modal.classList.remove('visible');
+  modalImg.src = '';
+  mz.currentSrc = '';
+}
+
+function applyZoom() {
+  modalImg.style.transform = `translate(${mz.x}px,${mz.y}px) scale(${mz.scale})`;
+  modalZoomInfo.textContent = mz.scale <= 0.35
+    ? '滚轮缩放 · 拖拽平移 · 双击重置'
+    : `${Math.round(mz.scale * 100)}% · 拖拽平移 · 双击重置`;
+}
+
+function modalZoom(dir) {
+  mz.scale = Math.max(0.1, Math.min(8, mz.scale * (dir > 0 ? 1.3 : 0.77)));
+  if (mz.scale < 0.38 && mz.scale > 0.32) { mz.scale = 0.35; mz.x = 0; mz.y = 0; }
+  applyZoom();
+}
+
+function modalReset() {
+  mz.scale = 0.35;
+  mz.x = 0;
+  mz.y = 0;
+  applyZoom();
+}
+
+function modalDownload() {
+  if (!mz.currentSrc) return;
+  const proxyUrl = 'https://herng9d2.mule.page/api/image-proxy?url=' + encodeURIComponent(mz.currentSrc);
+  fetch(proxyUrl).then(r => {
+    if (!r.ok) throw new Error();
+    return r.blob();
+  }).then(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `chestnut-ai-${Date.now()}.png`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }).catch(() => showToast('下载失败'));
+}
+
+// Wheel zoom
+modalWrap.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  modalZoom(e.deltaY < 0 ? 1 : -1);
+}, { passive: false });
+
+// Drag pan
+modalWrap.addEventListener('mousedown', (e) => {
+  if (mz.scale <= 0.35) return;
+  e.preventDefault();
+  mz.dragging = true;
+  mz.startX = e.clientX;
+  mz.startY = e.clientY;
+  mz.startTx = mz.x;
+  mz.startTy = mz.y;
+  modalWrap.classList.add('dragging');
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (!mz.dragging) return;
+  mz.x = mz.startTx + (e.clientX - mz.startX);
+  mz.y = mz.startTy + (e.clientY - mz.startY);
+  applyZoom();
+});
+
+window.addEventListener('mouseup', () => {
+  mz.dragging = false;
+  modalWrap.classList.remove('dragging');
+});
+
+// Double-click reset
+modalWrap.addEventListener('dblclick', (e) => {
+  e.stopPropagation();
+  modalReset();
+});
+
+// Touch support (pinch + drag)
+let touchDist = 0, touchScale = 1;
+modalWrap.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 2) {
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    touchDist = Math.hypot(dx, dy);
+    touchScale = mz.scale;
+  } else if (e.touches.length === 1 && mz.scale > 0.35) {
+    mz.dragging = true;
+    mz.startX = e.touches[0].clientX;
+    mz.startY = e.touches[0].clientY;
+    mz.startTx = mz.x;
+    mz.startTy = mz.y;
+  }
+}, { passive: true });
+
+modalWrap.addEventListener('touchmove', (e) => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    const dist = Math.hypot(dx, dy);
+    mz.scale = Math.max(0.25, Math.min(8, touchScale * (dist / touchDist)));
+    applyZoom();
+  } else if (e.touches.length === 1 && mz.dragging) {
+    mz.x = mz.startTx + (e.touches[0].clientX - mz.startX);
+    mz.y = mz.startTy + (e.touches[0].clientY - mz.startY);
+    applyZoom();
+  }
+}, { passive: false });
+
+modalWrap.addEventListener('touchend', () => {
+  mz.dragging = false;
+});
+
+// Click gallery to open modal (allow clicks on img, overlay background, but not buttons)
+galleryGrid.addEventListener('click', (e) => {
+  const item = e.target.closest('.gallery-item');
+  if (!item) return;
+  if (e.target.closest('.action-btn')) return; // don't open modal on action buttons
+  const img = item.querySelector('img');
+  if (img) openModal(img.src);
+});
+
+// Click backdrop (not container) to close
+modal.addEventListener('click', (e) => {
+  if (e.target === modal) closeModal();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (!modal.classList.contains('visible')) return;
+  if (e.key === 'Escape') closeModal();
+  if (e.key === '+' || e.key === '=') modalZoom(1);
+  if (e.key === '-') modalZoom(-1);
+  if (e.key === '0') modalReset();
+});
+
+generateBtn.addEventListener("click", function() { if (!currentUser) { showLoginModal(); showToast("请先登录后使用"); return; } generateImage(); });
+promptInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); generateImage(); }
+});
+
+// Load saved gallery on startup
+loadGallery();
+
+// ========== User System ==========
+// Device fingerprint for one-account-per-device restriction
+async function getDeviceId() {
+  // Use FingerprintJS if available
+  if (cachedVisitorId) {
+    return 'fp_' + cachedVisitorId;
+  }
+
+  // Try to get fresh fingerprint
+  try {
+    const visitorId = await initFingerprint();
+    if (visitorId) {
+      return 'fp_' + visitorId;
+    }
+  } catch (e) {
+    console.warn('FingerprintJS failed:', e);
+  }
+
+  // Fallback to simple fingerprint
+  const nav = navigator;
+  const screen = window.screen;
+  const components = [
+    nav.userAgent,
+    nav.language,
+    screen.colorDepth,
+    screen.width + 'x' + screen.height,
+    new Date().getTimezoneOffset(),
+    nav.hardwareConcurrency || '',
+    nav.platform || ''
+  ];
+  const str = components.join('|');
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return 'fallback_' + Math.abs(hash).toString(36);
+}
+
+function openPricingTable() {
+  window.open('/pricing-table.html', '_blank', 'width=960,height=720,scrollbars=yes');
+}
+
+const API_BASE = 'https://lizisucaiwang.online/api/ai';
+const isAdminMode = new URLSearchParams(window.location.search).get('admin') === '1';
+let currentUser = null;
+let authToken = localStorage.getItem('ai_token');
+
+// Modal functions
+function showLoginModal() {
+  document.getElementById('loginModal').style.display = 'flex';
+  document.getElementById('registerModal').style.display = 'none';
+}
+function closeLoginModal() {
+  document.getElementById('loginModal').style.display = 'none';
+}
+function showRegisterModal() {
+  document.getElementById('registerModal').style.display = 'flex';
+  document.getElementById('loginModal').style.display = 'none';
+}
+function closeRegisterModal() {
+  document.getElementById('registerModal').style.display = 'none';
+}
+function showRechargeModal() {
+  document.getElementById('rechargeModal').style.display = 'flex';
+  selectedAmount = 0;
+  document.querySelectorAll('.amount-btn').forEach(b => b.style.borderColor = 'var(--border)');
+}
+function closeRechargeModal() {
+  document.getElementById('rechargeModal').style.display = 'none';
+}
+
+// Login
+async function doLogin() {
+  const phone = document.getElementById('loginPhone').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!phone || !password) { showToast('请填写手机号和密码'); return; }
+  try {
+    const resp = await fetch(`${API_BASE}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, password })
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error);
+    authToken = data.token;
+    localStorage.setItem('ai_token', authToken);
+    currentUser = data.user;
+    updateUI();
+    closeLoginModal();
+    showToast('登录成功');
+  } catch (e) {
+    showToast(e.message || '登录失败');
+  }
+}
+
+// Register
+async function doRegister() {
+  const phone = document.getElementById('registerPhone').value.trim();
+  const password = document.getElementById('registerPassword').value;
+  const password2 = document.getElementById('registerPassword2').value;
+  if (!phone || !password) { showToast('请填写手机号和密码'); return; }
+  if (password.length < 6) { showToast('密码至少6位'); return; }
+  if (!/[a-z]/.test(password)) { showToast('密码必须包含小写字母'); return; }
+  if (!/[A-Z]/.test(password)) { showToast('密码必须包含大写字母'); return; }
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) { showToast('密码必须包含特殊符号'); return; }
+  if (password !== password2) { showToast('两次密码不一致'); return; }
+  try {
+    const resp = await fetch(`${API_BASE}/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, password, deviceId: await getDeviceId() })
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error);
+    authToken = data.token;
+    localStorage.setItem('ai_token', authToken);
+    currentUser = data.user;
+    updateUI();
+    closeRegisterModal();
+    showToast('注册成功，赠送3次免费生成');
+  } catch (e) {
+    showToast(e.message || '注册失败');
+  }
+}
+
+// Logout
+function logout() {
+  authToken = null;
+  currentUser = null;
+  localStorage.removeItem('ai_token');
+  updateUI();
+  showToast('已退出登录');
+}
+
+// Admin test account management
+async function initAdminTestAccount() {
+  try {
+    const resp = await fetch(`${API_BASE}/admin/test-account`, { method: 'POST' });
+    const data = await resp.json();
+    if (data.success) {
+      authToken = data.token;
+      currentUser = data.user;
+      localStorage.setItem('ai_token', authToken);
+      updateAdminBalanceDisplay();
+      console.log('Admin test account ready:', data.user.phone);
+    }
+  } catch (e) {
+    console.error('Failed to init admin test account:', e);
+  }
+}
+
+function updateAdminBalanceDisplay() {
+  const el = document.getElementById('adminBalance');
+  if (el && currentUser) {
+    el.textContent = '¥' + currentUser.balance.toFixed(2);
+  }
+}
+
+function showAdminTestInfo() {
+  if (!currentUser) {
+    showToast('测试账号未初始化');
+    return;
+  }
+  showToast('测试账号: ' + currentUser.phone + ' | 密码: AdminTest123!');
+}
+
+async function refreshAdminBalance() {
+  if (!authToken) return;
+  try {
+    const resp = await fetch(`${API_BASE}/user/info`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    if (resp.ok) {
+      currentUser = await resp.json();
+      updateAdminBalanceDisplay();
+    }
+  } catch (e) {
+    console.error('Refresh balance error:', e);
+  }
+}
+
+// Update UI based on login status
+function updateUI() {
+  const loginPrompt = document.getElementById('loginPrompt');
+  const userInfo = document.getElementById('userInfo');
+  // Admin mode: show test account info and enable recharge
+  if (isAdminMode) {
+    loginPrompt.style.display = 'none';
+    userInfo.style.display = 'none';
+    var adminBanner = document.getElementById('adminModeBanner');
+    if (!adminBanner) {
+      adminBanner = document.createElement('div');
+      adminBanner.id = 'adminModeBanner';
+      adminBanner.style.cssText = 'display:flex;align-items:center;gap:1rem;padding:0.5rem 1.2rem;background:rgba(200,162,200,0.15);border:1px solid rgba(200,162,200,0.3);border-radius:10px;flex-wrap:wrap;';
+      adminBanner.innerHTML = `
+        <span style="font-size:1.1rem">&#x1F451;</span>
+        <span style="font-size:0.85rem;color:var(--accent-bright);font-weight:500;">管理员测试账号</span>
+        <div style="background:var(--surface);padding:0.4rem 1rem;border-radius:8px;border:1px solid var(--border);">
+          <span style="font-size:0.8rem;color:var(--text-muted);">余额: </span>
+          <span id="adminBalance" style="font-weight:600;color:var(--accent);">¥0.00</span>
+        </div>
+        <button onclick="showRechargeModal()" style="padding:0.4rem 1rem;background:var(--accent);color:var(--bg);border:none;border-radius:6px;font-size:0.8rem;cursor:pointer;font-weight:500;">充值</button>
+        <button onclick="showAdminTestInfo()" style="padding:0.4rem 0.8rem;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:6px;font-size:0.8rem;cursor:pointer;">账号信息</button>
+      `;
+      document.getElementById('userSystem').prepend(adminBanner);
+    }
+    initAdminTestAccount();
+    return;
+  }
+  if (currentUser) {
+    loginPrompt.style.display = 'none';
+    userInfo.style.display = 'flex';
+    document.getElementById('userBalance').textContent = `¥${currentUser.balance.toFixed(2)}`;
+  } else {
+    loginPrompt.style.display = 'flex';
+    userInfo.style.display = 'none';
+  }
+}
+
+// Recharge
+// Check balance before generation
+async function checkBalance(model) {
+  // Admin mode: use real balance from test account
+  if (isAdminMode) {
+    if (!currentUser || !authToken) {
+      await initAdminTestAccount();
+      if (!currentUser) {
+        showToast('测试账号初始化失败');
+        return { allowed: false };
+      }
+    }
+    const checkResp = await fetch(`${API_BASE}/generate/check`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+      body: JSON.stringify({ model })
+    });
+    const checkData = await checkResp.json();
+    if (!checkData.allowed) {
+      showToast(checkData.message || '余额不足');
+      showRechargeModal();
+      return { allowed: false };
+    }
+    return checkData;
+  }
+  try {
+    const resp = await fetch(`${API_BASE}/pricing`);
+    const pricing = await resp.json();
+    const price = pricing[model]?.price || 0;
+    const isFree = pricing[model]?.free || false;
+
+    if (isFree) return { allowed: true, cost: 0, free: true };
+
+    if (!currentUser) {
+      // Not logged in: force login
+      showLoginModal();
+      showToast("请先登录后使用");
+      return { allowed: false };
+    }
+
+    // Logged in: check via API
+    const checkResp = await fetch(`${API_BASE}/generate/check`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+      body: JSON.stringify({ model })
+    });
+    const checkData = await checkResp.json();
+    if (!checkData.allowed) {
+      showToast(checkData.message || '余额不足');
+      showRechargeModal();
+      return { allowed: false };
+    }
+    return checkData;
+  } catch (e) {
+    console.error('Balance check error:', e);
+    return { allowed: true, cost: 0 }; // Fallback: allow
+  }
+}
+
+// Deduct balance after successful generation
+async function deductBalance(model, prompt, imageUrl, isFree) {
+  // Admin mode: deduct from real test account balance
+  if (isAdminMode) {
+    if (!currentUser || !authToken) return;
+    try {
+      const resp = await fetch(`${API_BASE}/generate/deduct`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+        body: JSON.stringify({ model, prompt, imageUrl, isFree })
+      });
+      const data = await resp.json();
+      if (data.success) {
+        currentUser.balance = data.balance;
+        currentUser.freeCredits = data.freeCredits;
+        updateAdminBalanceDisplay();
+      }
+    } catch (e) {
+      console.error('Admin deduct error:', e);
+    }
+    return;
+  }
+  if (!currentUser) {
+    // Not logged in: increment daily free count
+    const stored = JSON.parse(localStorage.getItem('ai_daily_free') || '{"date":"","count":0}');
+    stored.count++;
+    localStorage.setItem('ai_daily_free', JSON.stringify(stored));
+    return;
+  }
+  try {
+    const resp = await fetch(`${API_BASE}/generate/deduct`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+      body: JSON.stringify({ model, prompt, imageUrl, isFree })
+    });
+    const data = await resp.json();
+    if (data.success) {
+      currentUser.balance = data.balance;
+      currentUser.freeCredits = data.freeCredits;
+      updateUI();
+    }
+  } catch (e) {
+    console.error('Deduct error:', e);
+  }
+}
+
+// Initialize: check if user is logged in
+async function initUser() {
+
+  if (authToken) {
+    try {
+      const resp = await fetch(`${API_BASE}/user/info`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      if (resp.ok) {
+        currentUser = await resp.json();
+        updateUI();
+      } else {
+        localStorage.removeItem('ai_token');
+        authToken = null;
+      }
+    } catch (e) {
+      console.error('Init user error:', e);
+    }
+  }
+  updateUI();
+
+  // Check if payment callback
+  if (window.location.search.includes('payment=success')) {
+    showToast('支付成功，余额已更新');
+    if (authToken) {
+      setTimeout(() => {
+        fetch(`${API_BASE}/user/info`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        }).then(r => r.json()).then(data => {
+          currentUser = data;
+          updateUI();
+        });
+      }, 1000);
+    }
+  }
+}
+
+// Skip login init in admin mode
+if (!isAdminMode) {
+  initUser();
+} else {
+  updateUI();
+  // Check if payment callback
+  if (window.location.search.includes('payment=success')) {
+    showToast('支付成功，余额已更新');
+    setTimeout(() => {
+      refreshAdminBalance();
+    }, 1000);
+  }
+}
+</script>
+
+
+
+<!-- Customer Service Floating Button -->
+<div id="csFloatBtn" onclick="showCSModal()" style="position:fixed;bottom:2rem;right:2rem;width:56px;height:56px;background:linear-gradient(135deg,#c8a2c8,#a8c8c8);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(200,162,200,0.4);z-index:999;transition:transform 0.2s;">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+</div>
+
+<!-- Customer Service Modal -->
+<div id="csModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:var(--surface);padding:2rem;border-radius:16px;width:90%;max-width:400px;border:1px solid var(--border);text-align:center;" onclick="event.stopPropagation()">
+    <h3 style="margin:0 0 1.5rem 0;color:var(--accent);font-size:1.3rem;">联系客服</h3>
+    <div style="background:rgba(200,162,200,0.1);border:1px solid rgba(200,162,200,0.2);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;">
+      <p style="font-size:1rem;color:var(--text);margin:0 0 0.8rem 0;"><strong>微信号</strong></p>
+      <p style="font-size:1.5rem;color:var(--accent);font-weight:700;margin:0 0 0.5rem 0;letter-spacing:1px;">FP9044</p>
+      <button onclick="copyCS()" id="copyCSBtn" style="padding:0.5rem 1.5rem;background:var(--accent);color:var(--bg);border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.9rem;width:auto;">复制微信号</button>
+    </div>
+    <div style="background:rgba(168,200,200,0.1);border:1px solid rgba(168,200,200,0.2);border-radius:12px;padding:1rem;margin-bottom:1.5rem;">
+      <p style="font-size:0.85rem;color:var(--text-muted);margin:0;line-height:1.6;">
+        工作时间：9:00 - 22:00<br>
+        充值确认 / 问题反馈 / 使用帮助<br>
+        添加微信时请备注「栗子AI」
+      </p>
+    </div>
+    
+    <div style="margin-top:1.5rem;padding:1rem;background:rgba(168,200,200,0.1);border:1px solid rgba(168,200,200,0.2);border-radius:12px;">
+      <p style="font-size:0.9rem;color:var(--text);margin:0 0 1rem 0;"><strong>扫码添加客服</strong></p>
+      <img src="/wechat-qr.png" alt="微信客服二维码" style="width:200px;height:200px;border-radius:8px;object-fit:cover;" />
+    </div>
+
+    <button onclick="closeCSModal()" style="width:100%;padding:0.8rem;background:rgba(200,100,100,0.3);color:#ff8888;border:2px solid rgba(200,100,100,0.5);border-radius:8px;cursor:pointer;font-size:1rem;font-weight:600;">✕ 关闭</button>
+  </div>
+</div>
+
+<script>
+function showCSModal() {
+  document.getElementById('csModal').style.display = 'flex';
+}
+function closeCSModal() {
+  document.getElementById('csModal').style.display = 'none';
+}
+function copyCS() {
+  navigator.clipboard.writeText('FP9044').then(function() {
+    var btn = document.getElementById('copyCSBtn');
+    btn.textContent = '已复制!';
+    btn.style.background = '#4CAF50';
+    setTimeout(function() {
+      btn.textContent = '复制微信号';
+      btn.style.background = '';
+    }, 2000);
+  });
+}
+</script>
+</body></html>

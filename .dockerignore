@@ -1,0 +1,11 @@
+node_modules
+npm-debug.log
+data
+.env
+certbot
+.git
+.gitignore
+deploy.sh
+push-to-render.sh
+revert-to-stable.sh
+README.md

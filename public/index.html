@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="description" content="栗子素材网 - 专业美术素材下载平台，提供表情包、人物立绘、背景图、道具栏、特效等FLA源文件，支持在线预览，海量优质素材等你来下载">
+  <meta name="keywords" content="栗子素材网,素材下载,表情包素材,人物立绘,FLA源文件,美术素材,动漫素材,表情包下载,背景图,道具栏,特效素材,二次元素材">
+  <meta name="baidu-site-verification" content="codeva-F7HnFeaJlr" />
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <title>栗子素材网 - 专业美术素材下载平台</title>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="canonical" href="/" />
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="栗子素材网 - 专业美术素材下载平台">
+  <meta property="og:description" content="提供表情包、人物立绘、背景图、道具栏、特效等FLA源文件，支持在线预览，海量优质素材等你来下载">
+  <meta property="og:url" content="https://lizisucaiwang.online/">
+  <meta property="og:site_name" content="栗子素材网">
+  <meta property="og:image" content="https://lizisucaiwang.online/assets/assets/banner_optimized.jpg?v=20260603c">
+  <meta property="og:locale" content="zh_CN">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="栗子素材网 - 专业美术素材下载平台">
+  <meta name="twitter:description" content="提供表情包、人物立绘、背景图、道具栏、特效等FLA源文件，支持在线预览">
+  <meta name="twitter:image" content="https://lizisucaiwang.online/assets/assets/banner_optimized.jpg?v=20260603c">
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "栗子素材网",
+    "url": "https://lizisucaiwang.online/",
+    "description": "专业美术素材下载平台，提供表情包、人物立绘、背景图、道具栏、特效等FLA源文件",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://lizisucaiwang.online/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+  <link rel="stylesheet" href="/style.css?v=20260603e">
+</head>
+<body>
+  <!-- WeChat floating button -->
+  <button class="wechat-fab" id="wechatFab" title="微信联系" aria-label="微信联系我们">💬</button>
+  <div class="wechat-fab-modal" id="wechatFabModal">
+    <div class="wechat-fab-modal-box">
+      <img src="/assets/assets/wechat-qr.png" alt="微信二维码">
+      <p>微信扫码联系我们</p>
+      <button onclick="document.getElementById('wechatFabModal').classList.remove('active')">关闭</button>
+    </div>
+  </div>
+
+  <h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap">栗子素材网 - 专业美术素材下载平台，提供表情包、人物立绘、背景图、道具栏、特效等FLA源文件</h1>
+
+  <section class="carousel-wrap">
+    <div class="carousel-track">
+      <div class="carousel-slide"><div class="carousel-slide-inner"><picture><source media="(max-width: 640px)" srcset="/assets/assets/banner_mobile.jpg?v=20260603b"><img src="/assets/assets/banner_optimized.jpg?v=20260603c" alt="栗子素材网 - 专业美术素材下载平台"></picture></div></div>
+    </div>
+    <div class="carousel-notice">本站所有素材版权均已注册，未经允许禁止二次传播</div>
+  </section>
+
+  <main class="main-content">
+    <div class="admin-panel" id="adminPanel" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <h3 style="margin:0">管理员面板</h3>
+        <button onclick="openUserManager()" style="padding:6px 16px;background:#6366f1;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer">👥 账号管理</button>
+      </div>
+      <div style="padding-top:12px;border-top:1px solid #e5e7eb">
+        <h4 style="font-size:14px;margin-bottom:8px">🔧 系统维护</h4>
+        <button class="admin-add-btn" id="revertStableBtn" style="background:#dc2626" onclick="revertToStable()">⚠️ 恢复到稳定版本</button>
+        <div class="admin-msg" id="revertMsg"></div>
+        <div style="margin-top:12px;display:flex;align-items:center;gap:10px">
+          <span style="font-size:13px;color:#374151">🌐 栗子AI生图：</span>
+          <label style="position:relative;display:inline-block;width:48px;height:26px;cursor:pointer">
+            <input type="checkbox" id="aiMaintenanceToggle" onchange="toggleAiMaintenance(this)" style="opacity:0;width:0;height:0">
+            <span id="aiToggleSlider" style="position:absolute;inset:0;background:#ef4444;border-radius:26px;transition:0.3s"></span>
+            <span id="aiToggleKnob" style="position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:0.3s"></span>
+          </label>
+          <span id="aiMaintenanceStatus" style="font-size:13px;font-weight:600;color:#ef4444">维护中</span>
+        </div>
+      </div>
+    </div>
+    <div class="user-bar" id="userBar" style="display:none">
+      <div class="user-info">
+        <span class="user-name" id="userDisplayName"></span>
+        <span class="user-role" id="userRoleBadge"></span>
+      </div>
+      <div class="user-actions">
+        <button class="user-action-btn desktop-only" onclick="handleAiClick()">🌐 栗子AI生图</button>
+        <button class="user-action-btn desktop-only" onclick="openAppPopup('/voice/', '栗子配音')">🎙️ 栗子配音</button>
+        <button class="user-action-btn desktop-only" onclick="openAppPopup('/violation-detect.html', '短劇違規詞檢測')">🔍 短劇違規詞檢測</button>
+        <button class="user-action-btn desktop-only" onclick="openAppPopup('/multiview/', '图片多视角')">📷 图片多视角</button>
+        <button class="user-action-btn" onclick="openRequestModal()">📩 素材需求</button>
+        <button class="user-action-btn admin-notif-btn" id="notifBtn" onclick="openNotifPanel()" style="display:none;position:relative">🔔<span class="notif-badge" id="notifBadge" style="display:none"></span></button>
+        <button class="user-action-btn" onclick="openChangePwd()">修改密码</button>
+        <button class="user-action-btn logout-btn" onclick="doLogout()">退出登录</button>
+      </div>
+    </div>
+
+    <div class="login-prompt" id="loginPrompt">
+      <span>👋 欢迎使用栗子素材网，请先登录</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="login-prompt-btn desktop-only" onclick="handleAiClick()" style="background:#6366f1">🌐 栗子AI生图</button>
+        <button class="login-prompt-btn desktop-only" onclick="openAppPopup('/voice/', '栗子配音')" style="background:#10b981">🎙️ 栗子配音</button>
+        <button class="login-prompt-btn desktop-only" onclick="openAppPopup('/violation-detect.html', '短劇違規詞檢測')" style="background:#8b5cf6">🔍 短劇違規詞檢測</button>
+        <button class="login-prompt-btn" onclick="openRequestModal()" style="background:#f59e0b">📩 素材需求</button>
+        <button class="login-prompt-btn" onclick="openLogin()">立即登录</button>
+      </div>
+    </div>
+
+    
+
+    <section class="categories" id="categories">
+      <button class="cat-btn active" data-cat="人物">人物</button>
+      <button class="cat-btn" data-cat="表情包">表情包</button>
+      <button class="cat-btn" data-cat="画师寄售">画师寄售</button>
+      <button class="cat-btn" data-cat="背景图">背景图</button>
+      <button class="cat-btn" data-cat="道具栏">道具栏</button>
+      <button class="cat-btn" data-cat="特效">特效</button>
+      <button class="cat-btn" data-cat="素材打包" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white">素材打包</button>
+    </section>
+
+    <section class="sub-bar">
+      <div class="sub-tabs"></div>
+      <div class="search-box">
+        <input class="search-input" type="text" placeholder="搜索" id="searchInput">
+        <button class="search-btn" id="searchBtn">搜索</button>
+      </div>
+    </section>
+    <div class="bind-bar" id="bindBar" style="display:none;justify-content:flex-end;padding:8px 20px;background:#f8fafc;border-bottom:1px solid #e5e7eb">
+      <button onclick="openBindModal()" style="padding:6px 16px;background:#6366f1;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;margin-right:8px">🔗 绑定账号</button>
+      <button onclick="openMyBindings()" style="padding:6px 16px;background:#f3f4f6;color:#374151;border:1px solid #e5e7eb;border-radius:6px;font-size:13px;cursor:pointer;margin-right:8px">我的绑定</button>
+    </div>
+
+    <div class="admin-toolbar" id="adminToolbar" style="display:none">
+      <button class="admin-toolbar-btn add-btn" id="addMaterialBtn">+ 新增素材</button>
+      <button class="admin-toolbar-btn add-btn" id="batchAddBtn" style="background:#8b5cf6;border-color:#8b5cf6">📦 批量新增</button>
+      <button class="admin-toolbar-btn" id="viewReqBtn" style="background:#f59e0b;color:#fff;border-color:#f59e0b">📩 查看需求</button>
+      <button class="admin-toolbar-btn" id="viewBindingsBtn" style="background:#6366f1;color:#fff;border-color:#6366f1">🔗 查看绑定</button>
+      <span style="font-size:12px;color:#6b7280;margin-left:auto">管理员新增的素材会永久保存</span>
+    </div>
+
+    <div class="admin-panel" id="requestPanel" style="display:none">
+      <h3>📩 素材需求</h3>
+      <div id="requestList"></div>
+    </div>
+
+    <section class="card-grid" id="cardGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:#9ca3af">加载中...</div>
+    </section>
+
+    <section class="pagination-wrap">
+      <span class="page-total" id="pageTotal">共 0 条</span>
+      <div class="pagination-btns" id="paginationBtns"></div>
+    </section>
+  </main>
+
+  <!-- Login Modal -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal">
+      <button class="modal-close" data-close="loginModal">&times;</button>
+      <h3>登录</h3>
+      <div style="margin-bottom:12px"><label style="font-size:13px;color:#6b7280">用户名</label><input type="text" id="loginUser" placeholder="输入用户名" style="width:100%;padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:14px;margin-top:4px"></div>
+      <div style="margin-bottom:12px"><label style="font-size:13px;color:#6b7280">密码</label><input type="password" id="loginPass" placeholder="输入密码" style="width:100%;padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:14px;margin-top:4px"></div>
+      <button class="modal-submit" id="loginSubmit">登录</button>
+      <div class="modal-msg" id="loginMsg"></div>
+    </div>
+  </div>
+
+  <!-- Change Password Modal -->
+  <div class="modal-overlay" id="changePwdModal">
+    <div class="modal">
+      <button class="modal-close" data-close="changePwdModal">&times;</button>
+      <h3>修改密码</h3>
+      <div style="margin-bottom:12px"><label style="font-size:13px;color:#6b7280">当前密码</label><input type="password" id="oldPwd" placeholder="输入当前密码" style="width:100%;padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:14px;margin-top:4px"></div>
+      <div style="margin-bottom:12px"><label style="font-size:13px;color:#6b7280">新密码</label><input type="password" id="newPwd" placeholder="输入新密码" style="width:100%;padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:14px;margin-top:4px"></div>
+      <div style="margin-bottom:12px"><label style="font-size:13px;color:#6b7280">确认密码</label><input type="password" id="confirmPwd" placeholder="再次输入新密码" style="width:100%;padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:14px;margin-top:4px"></div>
+      <button class="modal-submit" id="changePwdSubmit">确认修改</button>
+      <div class="modal-msg" id="changePwdMsg"></div>
+    </div>
+  </div>
+
+  <!-- Request Modal -->
+  <div class="modal-overlay" id="requestModal">
+    <div class="modal" style="max-width:500px">
+      <button class="modal-close" data-close="requestModal">&times;</button>
+      <h3>提交素材需求</h3>
+      <div style="margin-bottom:12px"><label style="font-size:13px;color:#6b7280">需求描述 *</label><textarea id="reqContent" placeholder="描述你需要的素材..." style="width:100%;padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:14px;margin-top:4px;min-height:80px;resize:vertical"></textarea></div>
+      <div style="margin-bottom:12px"><label style="font-size:13px;color:#6b7280">参考图片（最多5张）</label>
+        <input type="file" id="reqImages" accept="image/*" multiple style="width:100%;padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:14px;margin-top:4px" onchange="previewReqImages(this)">
+        <div class="request-img-preview" id="reqImgPreview"></div>
+      </div>
+      <div style="margin-bottom:12px"><label style="font-size:13px;color:#6b7280">联络方式</label><input type="text" id="reqContact" placeholder="微信 / QQ / 手机号" style="width:100%;padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:14px;margin-top:4px"></div>
+      <button class="modal-submit" id="reqSubmit">提交</button>
+      <div class="modal-msg" id="reqMsg"></div>
+    </div>
+  </div>
+
+  <!-- Notification Panel -->
+  <div class="notif-panel" id="notifPanel">
+    <div class="notif-panel-header">
+      <h3>🔔 通知</h3>
+      <button class="notif-panel-close" onclick="closeNotifPanel()">&times;</button>
+    </div>
+    <div id="notifList"><div style="padding:20px;text-align:center;color:#9ca3af;font-size:13px">暂无通知</div></div>
+  </div>
+
+  <!-- Add/Edit Material Modal -->
+  <div class="modal-overlay" id="bindModal">
+    <div class="modal-content" style="max-width:400px">
+      <button class="modal-close" data-close="bindModal">&times;</button>
+      <h3>绑定平台账号</h3>
+      <div style="margin:16px 0">
+        <div class="modal-field">
+          <label>平台</label>
+          <select id="bindPlatform">
+            <option value="抖音">抖音</option>
+            <option value="Bilibili">Bilibili</option>
+          </select>
+        </div>
+        <div class="modal-field">
+          <label>平台账号</label>
+          <input type="text" id="bindAccount" placeholder="输入你的平台账号名或UID">
+        </div>
+        <div class="modal-msg" id="bindMsg"></div>
+        <button id="bindSubmit" style="width:100%;padding:10px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;margin-top:8px">绑定</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="myBindingsModal">
+    <div class="modal-content" style="max-width:500px">
+      <button class="modal-close" data-close="myBindingsModal">&times;</button>
+      <h3>我的绑定</h3>
+      <div id="myBindingsList" style="margin:16px 0;font-size:14px"></div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="allBindingsModal">
+    <div class="modal-content" style="max-width:600px">
+      <button class="modal-close" data-close="allBindingsModal">&times;</button>
+      <h3>🔗 全部绑定</h3>
+      <div id="allBindingsList" style="margin:16px 0;font-size:13px"></div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="editModal">
+    <div class="modal" style="max-width:500px">
+      <button class="modal-close" data-close="editModal">&times;</button>
+      <h3 id="editModalTitle">新增素材</h3>
+      <div style="margin-bottom:12px"><label style="font-size:13px;color:#6b7280">素材名称（留空自动使用文件名）</label><input type="text" id="editName" placeholder="输入素材名称或留空" style="width:100%;padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:14px;margin-top:4px"></div>
+      <div style="margin-bottom:12px"><label style="font-size:13px;color:#6b7280">分类</label><select id="editCat" style="width:100%;padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:14px;margin-top:4px"><option value="表情包">表情包</option><option value="人物">人物</option><option value="画师寄售">画师寄售</option><option value="背景图">背景图</option><option value="道具栏">道具栏</option><option value="特效">特效</option><option value="限时优惠">限时优惠</option></select></div>
+      <div style="margin-bottom:12px"><label style="font-size:13px;color:#6b7280">标签</label>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:4px;font-size:13px">
+          <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="editBadgeLimit"> <span style="color:#92400e;background:#fef3c7;padding:2px 8px;border-radius:3px;font-size:12px;font-weight:600">限时</span></label>
+          <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="editBadgeHot"> <span style="color:#dc2626;background:#fee2e2;padding:2px 8px;border-radius:3px;font-size:12px;font-weight:600">热门</span></label>
+          <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="editBadgeVip"> <span style="color:#4f46e5;background:#e0e7ff;padding:2px 8px;border-radius:3px;font-size:12px;font-weight:600">VIP</span></label>
+          <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="editBadgeRecommend"> <span style="color:#059669;background:#d1fae5;padding:2px 8px;border-radius:3px;font-size:12px;font-weight:600">推荐</span></label>
+          <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="editBadgeFree"> <span style="color:#2563eb;background:#dbeafe;padding:2px 8px;border-radius:3px;font-size:12px;font-weight:600">免费</span></label>
+        </div>
+        <div style="margin-top:4px;font-size:12px;color:#9ca3af">默认自带：版权、new</div>
+      </div>
+      <div style="margin-bottom:12px"><label style="font-size:13px;color:#6b7280">上传素材文件（支持 .fla .gif .png .psd .swf 等，最多10个）</label>
+        <input type="file" id="editFileUpload" multiple style="width:100%;padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:14px;margin-top:4px" onchange="previewEditFiles(this)">
+        <div id="editFileList" style="margin-top:8px"></div>
+      </div>
+      <input type="hidden" id="editIndex" value="">
+      <button class="modal-submit" id="editSubmit">保存</button>
+      <div class="modal-msg" id="editMsg"></div>
+    </div>
+  </div>
+
+  <!-- Batch Upload Modal -->
+  <div class="modal-overlay" id="batchModal">
+    <div class="modal" style="max-width:600px">
+      <button class="modal-close" data-close="batchModal">&times;</button>
+      <h3>📦 批量新增素材</h3>
+      <p style="font-size:12px;color:#6b7280;margin-bottom:12px">
+        选择多个文件，每个文件会自动成为一个独立素材。<br>
+        文件名会作为素材名称。相同文件名的不同格式（如 xxx.png 和 xxx.fla）会合并为同一个素材。
+      </p>
+      <div style="margin-bottom:12px"><label style="font-size:13px;color:#6b7280">分类</label><select id="batchCat" style="width:100%;padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:14px;margin-top:4px"><option value="人物">人物</option><option value="表情包">表情包</option><option value="画师寄售">画师寄售</option><option value="背景图">背景图</option><option value="道具栏">道具栏</option><option value="特效">特效</option><option value="限时优惠">限时优惠</option></select></div>
+      <div style="margin-bottom:12px"><label style="font-size:13px;color:#6b7280">标签</label>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:4px;font-size:13px">
+          <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="batchBadgeNew" checked> <span style="color:#166534;background:#dcfce7;padding:2px 8px;border-radius:3px;font-size:12px;font-weight:600">new</span></label>
+          <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="batchBadgeLimit"> <span style="color:#92400e;background:#fef3c7;padding:2px 8px;border-radius:3px;font-size:12px;font-weight:600">限时</span></label>
+          <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="batchBadgeHot"> <span style="color:#dc2626;background:#fee2e2;padding:2px 8px;border-radius:3px;font-size:12px;font-weight:600">热门</span></label>
+          <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="batchBadgeVip"> <span style="color:#4f46e5;background:#e0e7ff;padding:2px 8px;border-radius:3px;font-size:12px;font-weight:600">VIP</span></label>
+        </div>
+      </div>
+      <div style="margin-bottom:12px"><label style="font-size:13px;color:#6b7280">选择文件（支持多选）</label>
+        <input type="file" id="batchFileInput" multiple style="width:100%;padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:14px;margin-top:4px" onchange="previewBatchFiles(this)">
+        <div id="batchFileList" style="max-height:250px;overflow-y:auto;margin-top:8px"></div>
+      </div>
+      <button class="modal-submit" id="batchSubmit">批量上传</button>
+      <div class="modal-msg" id="batchMsg"></div>
+    </div>
+  </div>
+
+  <!-- Preview Overlay -->
+  <div class="preview-overlay" id="previewOverlay">
+    <button class="preview-close" id="previewClose">&times;</button>
+    <div class="preview-title" id="previewTitle"></div>
+    <div class="preview-main"><div class="preview-main-img" id="previewMainImg"></div></div>
+    <div class="preview-thumbs" id="previewThumbs"></div>
+    <div class="preview-files" id="previewFiles"></div>
+    <div class="preview-dl-area" id="previewDlArea"></div>
+  </div>
+
+  <!-- Pack Panel -->
+  <div class="pack-overlay" id="packOverlay"></div>
+  <div class="pack-panel" id="packPanel"></div>
+
+  
+  <footer style="max-width:1200px;margin:0 auto;padding:20px 16px;text-align:center;font-size:12px;color:#9ca3af;border-top:1px solid #e5e7eb">
+    <p>本站所有素材版权均已注册，未经允许禁止二次传播</p>
+  </footer>
+<script src="/app.js?v=20260603" defer></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+</script>
+
+  <!-- User Manager Modal -->
+  <div class="modal-overlay" id="userManagerModal">
+    <div class="modal" style="max-width:550px;max-height:80vh;overflow-y:auto">
+      <button class="modal-close" onclick="closeUserManager()">&times;</button>
+      <h3>👥 账号管理</h3>
+      <p style="font-size:12px;color:#6b7280;margin-bottom:12px">
+        仅管理员可新增账号，默认密码 123456，登录后可自行修改。<br>
+        角色说明：user=仅下载表情包，vip=下载全部素材，promo=限时优惠+道具栏，admin=管理员+全部下载
+      </p>
+      <div class="admin-row">
+        <div class="modal-field"><label>新用户名</label><input type="text" id="adminNewUser" placeholder="输入用户名"></div>
+        <div class="modal-field"><label>角色</label><select id="adminNewRole"><option value="user">user (仅表情包)</option><option value="promo">promo (表情包+限时优惠)</option><option value="vip">vip (全部下载)</option><option value="admin">admin (管理员)</option></select></div>
+        <button class="admin-add-btn" id="addUserBtn">新增账号</button>
+      </div>
+      <div class="admin-msg" id="adminMsg"></div>
+      <div class="admin-user-list" id="adminUserList"></div>
+    </div>
+  </div>
+
+</body>
+</html>
