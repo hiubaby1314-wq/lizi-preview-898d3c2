@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Install dependencies first (better cache layer)
 COPY package*.json ./
-RUN npm ci --production
+RUN npm install --omit=dev
 
 # Copy app files
 COPY . .
